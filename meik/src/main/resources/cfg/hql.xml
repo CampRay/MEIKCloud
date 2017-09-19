@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>  
+  <sql-query name="findUserData">
+  	<return alias="ud" class="com.nuvomed.dto.TuserData">
+  	  <return-property name="dataId" column="dataId"/>
+      <return-property name="userId" column="userId"/>   
+      <return-property name="fileName" column="fileName"/>
+      <return-property name="dataType" column="dataType"/>     		
+  	</return>
+  	<![CDATA[select ud.dataId AS dataId,ud.userId AS userId,ud.fileName AS fileName,ud.dataType AS dataType from TuserData ud where ud.userId= ? and ud.dataType=?]]>
+  </sql-query>  
+  
+  <sql-query name="findAllUserData">
+  	<return alias="ud" class="com.nuvomed.dto.TuserData">
+  	  <return-property name="dataId" column="dataId"/>
+      <return-property name="userId" column="userId"/>   
+      <return-property name="fileName" column="fileName"/>
+      <return-property name="dataType" column="dataType"/>     		
+  	</return>
+  	<![CDATA[select ud.dataId AS dataId,ud.userId AS userId,ud.fileName AS fileName,ud.dataType AS dataType from TuserData ud where ud.userId= ?]]>
+  </sql-query> 
+  <!-- 
+  <sql-query name="updateUserInfo">  	
+  	<![CDATA[update user_points set points=:POINTS where userid=:ID]]>
+  </sql-query>
+   -->
+</hibernate-mapping>
