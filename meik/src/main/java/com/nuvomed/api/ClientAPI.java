@@ -115,7 +115,7 @@ public class ClientAPI {
 				Tlicense tLicense=licenseService.getLicenseById(license);
 				if(tLicense==null){
 					respJson.put("status", 0);
-					respJson.put("info", "The license is invoid.");
+					respJson.put("info", "The license is invalid.");
 				}
 				else if(!tLicense.isStatus()){
 					respJson.put("status", 0);
@@ -160,7 +160,7 @@ public class ClientAPI {
 		JSONObject respJson = new JSONObject();	
 		if (jsonStr == null || jsonStr.isEmpty()) {
 			respJson.put("status", 0);
-			respJson.put("info", "The license is invoid.");
+			respJson.put("info", "The license is invalid.");
 			return JSON.toJSONString(respJson);
 		}
 		
@@ -169,14 +169,14 @@ public class ClientAPI {
 		String cpuid = jsonObj.getString("cpuid");			
 		if (license==null||license.isEmpty()) {
 			respJson.put("status", 0);	
-			respJson.put("info", "The license is invoid.");
+			respJson.put("info", "The license is invalid.");
 			return JSON.toJSONString(respJson);
 		}
 			
 		Tlicense tLicense=licenseService.getLicenseById(license);
 		if(tLicense==null){
 			respJson.put("status", 0);
-			respJson.put("info", "The license is invoid.");
+			respJson.put("info", "The license is invalid.");
 		}
 		else if(!tLicense.isStatus()){
 			respJson.put("status", 0);
