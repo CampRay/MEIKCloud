@@ -12,7 +12,7 @@
 			<column name="user_id" length="11" not-null="true"/>							
 		</property>
 		<property name="fileName" type="java.lang.String">
-			<column name="filename" length="100" not-null="true" default="">
+			<column name="filename" length="500" not-null="true" default="">
 			</column>
 		</property>
 		<property name="stream" type="binary">

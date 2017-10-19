@@ -18,4 +18,5 @@ public interface UserDataService{
 	TuserData loadScreenPdfReport(int userId);
 	TuserData loadScreenZip(int userId);
 	TuserData loadDoctorZip(int userId);
+	TuserData loadCsvFile(int userId);
 }

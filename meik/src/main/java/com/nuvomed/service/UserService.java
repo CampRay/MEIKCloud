@@ -9,7 +9,7 @@ import com.nuvomed.model.PagingData;
 
 public interface UserService {
 	
-	Tuser getUserById(String userId);
+	Tuser getUserById(int userId);
 	
 	void createUser(Tuser User);
 	

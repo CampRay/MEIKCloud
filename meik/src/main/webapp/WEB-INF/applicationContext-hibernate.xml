@@ -44,6 +44,7 @@
 	      <value>cfg/Setting.hbm.xml</value>	      
 	      <value>cfg/Language.hbm.xml</value>	      
 	      <value>cfg/LocalizedField.hbm.xml</value>
+	      <value>cfg/AdminLog.hbm.xml</value>
 	      <value>cfg/User.hbm.xml</value>          
 	      <value>cfg/UserData.hbm.xml</value>
 	      <value>cfg/UserInfo.hbm.xml</value>
@@ -63,7 +64,7 @@
 		<prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</prop>
 		<prop key="hibernate.dialect">${db.sql.dialect}</prop>
 		<prop key="hibernate.cache.use_query_cache">false</prop>
-		<prop key="hibernate.show_sql">true</prop>
+		<prop key="hibernate.show_sql">false</prop>
 	    <!--自动更新数据库表结构，create 创建，update 修改
 	    <prop key="hibernate.hbm2ddl.auto">update</prop> --> 
 		<prop key="hibernate.cache.use_second_level_cache">false</prop>

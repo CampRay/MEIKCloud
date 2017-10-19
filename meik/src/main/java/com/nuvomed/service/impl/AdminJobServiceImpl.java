@@ -31,6 +31,7 @@ import com.nuvomed.commons.SystemConfig;
 import com.nuvomed.dao.AdminJobDao;
 import com.nuvomed.dao.AdminRoleDao;
 import com.nuvomed.dao.AdminUserDao;
+import com.nuvomed.dao.GroupUserDao;
 import com.nuvomed.dao.UserDao;
 import com.nuvomed.dao.UserDataDao;
 import com.nuvomed.dao.UserInfoDao;
@@ -67,10 +68,9 @@ public class AdminJobServiceImpl implements AdminJobService {
 	@Autowired
 	private UserInfoDao userInfoDao;
 	@Autowired
-	private UserDataDao userDataDao;
+	private UserDataDao userDataDao;	
 	@Autowired
-	private GroupUserService groupUserService;
-	
+	private GroupUserDao groupUserDao;
 	
 	@Autowired
 	private UserService userService;
@@ -260,12 +260,20 @@ public class AdminJobServiceImpl implements AdminJobService {
 	 * @param rdtp
 	 * @param adminId
 	 */	
-	public PagingData loadAdminJobList(DataTableParamter rdtp,String adminId) {
+	public PagingData loadAdminJobList(DataTableParamter rdtp,TadminUser adminUser) {
 		SimpleDateFormat simpleDateFormat =new SimpleDateFormat("MM/dd/yyyy");
 		String searchJsonStr=rdtp.getsSearch();
 		List<Criterion> criterionsList=new ArrayList<Criterion>();
-		if(adminId!=null){
-			criterionsList.add(Restrictions.eq("createdBy", adminId));
+		if(adminUser!=null){
+			if(adminUser.getAdminRole().getRoleId()!=1&&adminUser.getAdminRole().getRoleId()!=4){
+				criterionsList.add(Restrictions.eq("createdBy", adminUser.getAdminId()));
+			}
+			else if(adminUser.getAdminRole().getRoleId()==4){//当前用户是系统医生时，可以显示所有同一组用户上传的数据				
+				List<String> adminIdList=groupUserDao.getAdminIdsByUser(adminUser);
+				if(adminIdList.size()>0){
+					criterionsList.add(Restrictions.in("createdBy", adminIdList));
+				}
+			}			
 		}
 		if(searchJsonStr!=null&&!searchJsonStr.isEmpty()){			
 			JSONObject jsonObj= (JSONObject)JSON.parse(searchJsonStr);						
@@ -337,13 +345,21 @@ public class AdminJobServiceImpl implements AdminJobService {
 	/**
 	 * 醫生數據統計列表查詢
 	 */
-	public PagingData loadDoctorJobList(DataTableParamter rdtp,String adminId) {				
+	public PagingData loadDoctorJobList(DataTableParamter rdtp,TadminUser adminUser) {				
 		SimpleDateFormat simpleDateFormat =new SimpleDateFormat("MM/dd/yyyy");
 		String searchJsonStr=rdtp.getsSearch();
 		List<Criterion> criterionsList=new ArrayList<Criterion>();
-		if(adminId!=null){			
-			criterionsList.add(Restrictions.eq("createdBy", adminId));
-			      
+		if(adminUser!=null){
+			if(adminUser.getAdminRole().getRoleId()!=1&&adminUser.getAdminRole().getRoleId()!=4){
+				criterionsList.add(Restrictions.eq("adminUser.adminId", adminUser.getAdminId()));
+			}
+			else if(adminUser.getAdminRole().getRoleId()==4){//当前用户是系统医生时，可以显示所有同一组用户上传的数据				
+				List<String> adminIdList=groupUserDao.getAdminIdsByUser(adminUser);
+				if(adminIdList.size()>0){
+					criterionsList.add(Restrictions.in("createdBy", adminIdList));
+				}
+			}
+			
 		}
 		if(searchJsonStr!=null&&!searchJsonStr.isEmpty()){			
 			JSONObject jsonObj= (JSONObject)JSON.parse(searchJsonStr);						
@@ -416,9 +432,21 @@ public class AdminJobServiceImpl implements AdminJobService {
 	 * 醫生數據統計列表查詢
 	 */
 	@SuppressWarnings("unchecked")
-	public List<TadminJob> loadDoctorJobList(TadminJob searchObj) {
+	public List<TadminJob> loadDoctorJobList(TadminJob searchObj,TadminUser adminUser) {
 		SimpleDateFormat simpleDateFormat =new SimpleDateFormat("MM/dd/yyyy");		
-		List<Criterion> criterionsList=new ArrayList<Criterion>();		
+		List<Criterion> criterionsList=new ArrayList<Criterion>();	
+		if(adminUser!=null){
+			if(adminUser.getAdminRole().getRoleId()!=1&&adminUser.getAdminRole().getRoleId()!=4){
+				criterionsList.add(Restrictions.eq("adminUser.adminId", adminUser.getAdminId()));
+			}
+			else if(adminUser.getAdminRole().getRoleId()==4){//当前用户是系统医生时，可以显示所有同一组用户上传的数据				
+				List<String> adminIdList=groupUserDao.getAdminIdsByUser(adminUser);
+				if(adminIdList.size()>0){
+					criterionsList.add(Restrictions.in("createdBy", adminIdList));
+				}
+			}
+			
+		}
 		if(searchObj!=null){
 			if(searchObj.getCreatedBy()!=null&&!searchObj.getCreatedBy().isEmpty()){
 				criterionsList.add(Restrictions.eq("createdBy", searchObj.getCreatedBy()));
@@ -476,106 +504,36 @@ public class AdminJobServiceImpl implements AdminJobService {
 		}
 		return adminJobDao.createCriteria().list();
 	}
+		
 	
-	
-	
-	/**
-	 * 操作员數據統計列表查詢
-	 */
-	public PagingData loadOperatorJobList(DataTableParamter rdtp,String adminId) {				
-		SimpleDateFormat simpleDateFormat =new SimpleDateFormat("MM/dd/yyyy");
-		String searchJsonStr=rdtp.getsSearch();
-		List<Criterion> criterionsList=new ArrayList<Criterion>();
-		if(adminId!=null){
-			List<String> adminIdList=groupUserService.getAllSameGroupUsers(adminId);			
-			criterionsList.add(Restrictions.in("createdBy", adminIdList));			      
-		}
-		if(searchJsonStr!=null&&!searchJsonStr.isEmpty()){			
-			JSONObject jsonObj= (JSONObject)JSON.parse(searchJsonStr);						
-			
-			Set<String> keys=jsonObj.keySet();						
-			for (String key : keys) {
-				String val=jsonObj.getString(key);
-				if(val!=null&&!val.isEmpty()){
-					if(key=="status"){
-						criterionsList.add(Restrictions.eq(key, jsonObj.getBoolean(key)));
-					}
-					else if(key=="type"){
-						criterionsList.add(Restrictions.eq(key, jsonObj.getInteger(key)));
-					}
-					else if(key=="code"){
-						List<Tuser> users=userDao.findBy("code", val);
-						List<Integer> ids=new ArrayList<Integer>();
-						for (Tuser user : users) {
-							ids.add(user.getUserId());
-						}
-						if(ids.size()>0){
-							criterionsList.add(Restrictions.in("user.userId", ids));
-						}
-						else{
-							criterionsList.add(Restrictions.eq("user.userId", 0));
-						}
-					}
-					else if(key=="startTime"){
-						Date sdate = null;
-						try {
-							sdate = simpleDateFormat.parse(val);							
-						} catch (ParseException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						Long startLong=sdate.getTime();						
-						criterionsList.add(Restrictions.ge("doneTime", startLong));
-					}
-					else if(key=="endTime"){
-						Date edate = null;
-						try {
-							edate = simpleDateFormat.parse(val);							
-						} catch (ParseException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						Long endLong=edate.getTime();						
-						criterionsList.add(Restrictions.le("doneTime", endLong));
-					}
-					else{
-						criterionsList.add(Restrictions.eq(key, jsonObj.get(key)));
-					}
-				}
-			}						
-		}
-
-		if(criterionsList.size()>0){
-			Criterion[] criterions=new Criterion[criterionsList.size()];
-			int i=0;
-			for (Criterion criterion : criterionsList) {
-				criterions[i]=criterion;	
-				i++;
-			}
-			return adminJobDao.findPage(criterions,rdtp.iDisplayStart, rdtp.iDisplayLength);
-		}
-		return adminJobDao.findPage(rdtp.iDisplayStart, rdtp.iDisplayLength);
-	}
 	
 	/**
 	 * 检测员數據統計列表查詢
 	 */
 	@SuppressWarnings("unchecked")
-	public List<TadminJob> loadOperatorJobList(TadminJob searchObj,String adminId) {
+	public List<TadminJob> loadOperatorJobList(TadminJob searchObj,TadminUser adminUser) {
 		SimpleDateFormat simpleDateFormat =new SimpleDateFormat("MM/dd/yyyy");		
-		List<Criterion> criterionsList=new ArrayList<Criterion>();		
-		if(searchObj!=null){
-			if(adminId!=null){
-				List<String> adminIdList=groupUserService.getAllSameGroupUsers(adminId);			
-				criterionsList.add(Restrictions.in("createdBy", adminIdList));
+		List<Criterion> criterionsList=new ArrayList<Criterion>();	
+		if(adminUser!=null){
+			if(adminUser.getAdminRole().getRoleId()!=1&&adminUser.getAdminRole().getRoleId()!=4){
+				criterionsList.add(Restrictions.eq("createdBy", adminUser.getAdminId()));
 			}
+			else if(adminUser.getAdminRole().getRoleId()==4){//当前用户是系统医生时，可以显示所有同一组用户上传的数据				
+				List<String> adminIdList=groupUserDao.getAdminIdsByUser(adminUser);
+				if(adminIdList.size()>0){
+					criterionsList.add(Restrictions.in("createdBy", adminIdList));
+				}
+			}
+			
+		}
+		if(searchObj!=null){			
 			if(searchObj.getCreatedBy()!=null&&!searchObj.getCreatedBy().isEmpty()){
 				criterionsList.add(Restrictions.eq("createdBy", searchObj.getCreatedBy()));
 			}
 			
 			if(searchObj.getDoctor()!=null&&!searchObj.getDoctor().isEmpty()){
 				criterionsList.add(Restrictions.eq("adminUser.adminId", searchObj.getDoctor()));
-			}
+			}			
 			if(searchObj.getType()>0){
 				criterionsList.add(Restrictions.eq("type", searchObj.getType()));
 			}			
@@ -772,41 +730,54 @@ public class AdminJobServiceImpl implements AdminJobService {
 			}	
 	    }
 					
-		TadminJob adminJob=new TadminJob();									
+		TadminJob adminJob=new TadminJob();			
 		adminJob.setType(2);
 		adminJob.setStatus(false);
 		adminJob.setUser(user);
 		adminJob.setCreatedBy(createdBy);
 		adminJob.setCreatedTime(System.currentTimeMillis());
-		String doctorId=SystemConfig.Admin_Setting_Map.get("System_Doctor_Id");
-		TadminUser systemDoctor=adminUserDao.get(doctorId);
-		if(systemDoctor!=null){
+		//查询操作员所在组的系统医生（报表管理员）帐号		
+		List<TadminUser> systemDocotrList=groupUserDao.getManagerIdsByUser(createdBy);
+		TadminUser systemDoctor=null;
+		if(systemDocotrList.size()>0){
+			systemDoctor=systemDocotrList.get(0);
 			adminJob.setAdminUser(systemDoctor);
 			adminJob.setAssignTime(System.currentTimeMillis());
 		}
-		adminJobDao.create(adminJob);
-			
-		//如果設置了需要自動創建帳號
-		if(SystemConfig.Admin_Setting_Map.get("Create_Account").equalsIgnoreCase("true")){
-			if(systemDoctor.getAdminInfo()==null||systemDoctor.getAdminInfo().getNotify()){
-				try{
-					//发送通知电邮					
-					TemaiMessage message=new TemaiMessage();
-					message.setTo(systemDoctor.getEmail());
-					message.setText("The MEIK screen data of client "+adminJob.getUser().getCode()+" is uploaded, please log in to your account in the MEIK Report Tool Application and receive the screen data for this client.");
-					message.setSubject("MEIK screen data notification");
-					EMailTool.send(message);
-				}
-				catch(Exception e){}
+		else{//如果用户组中没有系统医生帐号，则指定Screen数据给系统配置的系统医生
+			String doctorId=SystemConfig.Admin_Setting_Map.get("System_Doctor_Id");
+			systemDoctor=adminUserDao.get(doctorId);
+			if(systemDoctor!=null){
+				adminJob.setAdminUser(systemDoctor);
+				adminJob.setAssignTime(System.currentTimeMillis());
 			}
 		}
+		adminJobDao.create(adminJob);
+			
+		//如果系统医生帐号設置了接收通知电邮，则发送通知电邮		
+		if(systemDoctor.getAdminInfo()==null||systemDoctor.getAdminInfo().getNotify()){
+			try{
+				//发送通知电邮					
+				TemaiMessage message=new TemaiMessage();
+				message.setTo(systemDoctor.getEmail());
+				message.setText("The MEIK screen data of client "+adminJob.getUser().getCode()+" is uploaded, please log in to your account in the MEIK Report Tool Application and receive the screen data for this client.");
+				message.setSubject("MEIK screen data notification");
+				EMailTool.send(message);
+			}
+			catch(Exception e){}
+		}
+		
 																	
 		//更新用户信息表			
 		TuserInfo userInfo=null;			
 		//根据clientNumber是否为空，判断是否是在网站登记的用户信息，如果是则修改信息，否则需要新建UserInfo记录
 		if(clientNumber!=null&&!clientNumber.isEmpty()){
 			if(StringTool.isNumber(clientNumber)){
-				userInfo=userInfoDao.get(Integer.parseInt(clientNumber));
+				try{
+					int clientNum=Integer.parseInt(clientNumber);
+					userInfo=userInfoDao.get(clientNum);
+				}
+				catch(Exception ee){}
 			}
 		}
 		
@@ -831,6 +802,7 @@ public class AdminJobServiceImpl implements AdminJobService {
 			userInfoDao.create(userInfo);
 		}
    }
+
 
 	   	
 }

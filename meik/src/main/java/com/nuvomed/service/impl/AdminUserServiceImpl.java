@@ -196,7 +196,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 	@SuppressWarnings("unchecked")
 	public List<TadminUser> loadAllAdminUserList() {
 		Criteria criteria=adminUserDao.createCriteria();
-		criteria.add(Restrictions.le("adminRole.roleId", new Integer(3)));
+		criteria.add(Restrictions.le("adminRole.roleId", new Integer(4)));
 		return criteria.list();
 	}
 

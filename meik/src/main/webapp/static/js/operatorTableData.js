@@ -67,18 +67,24 @@ var OperatorTable = function () {
         			}
 			   },
 	           {'render':function(data,status,row){
-				   		var str = '';
+				   		var str = '';	                    
 	                    if(row.screenResult!=null){
-	                    	var result=loadProperties("job.screen.result.normal",local,rootURI);
+	                    	var url = rootURI+"jobs/downloadScreenPdf/"+row.jobId;
+	                    	var csvUrl = rootURI+"jobs/downloadScreenCsv/"+row.jobId;
+	                    	var result="";
+	                    	if(row.screenResult==0){
+	                    		result=loadProperties("job.screen.result.normal",local,rootURI);
+	                    		str = '<div class="actions">'+result+": "+'<a class="btn btn-sm dark"  href="'+url+'" style="text-decoration: underline;">PDF</a><a class="btn btn-sm dark"  href="'+csvUrl+'" style="text-decoration: underline">CSV</a></div>'
+	                    	}
 	                    	if(row.screenResult==1){
 	                    		result=loadProperties("job.screen.result.benign",local,rootURI);
+	                    		str = '<div class="actions">'+result+": "+'<a class="btn btn-sm dark"  href="'+url+'" style="text-decoration:underline;">PDF</a><a class="btn btn-sm dark"  href="'+csvUrl+'" style="text-decoration: underline">CSV</a></div>'
 	                    	}
 	                    	else if(row.screenResult==2){
 	                    		result=loadProperties("job.screen.result.suspicious",local,rootURI);
-	                    	}	                    	
-	                    	var url = rootURI+"jobs/downloadScreenPdf/"+row.jobId;
-		   					str = '<div class="actions">'+result+": "+'<a class="btn btn-sm dark"  href="'+url+'">PDF</a></div>'
-	                    }		   						   				
+	                    		str = '<div class="actions">'+result+": "+'<a class="btn btn-sm dark"  href="'+url+'" style="text-decoration: underline">PDF</a><a class="btn btn-sm dark"  href="'+csvUrl+'" style="text-decoration: underline">CSV</a></div>'
+	                    	}	                    			   					
+	                    }	
 		   				return str;
    					}
 			  },
@@ -87,21 +93,21 @@ var OperatorTable = function () {
 	   				var str = '';
 	   				if(tem==7){
 	   					var url = rootURI+"jobs/download/"+row.jobId;
-	   					str = '<div class="actions"><a class="btn btn-sm dark"  href="'+url+'">'+loadProperties("job.action.download",local,rootURI)+'</a></div>'
+	   					str = '<div class="actions"><a class="btn btn-sm dark"  href="'+url+'" style="text-decoration: underline">'+loadProperties("job.action.download",local,rootURI)+'</a></div>'
 	   				}	   				
 	   				return str;
 				}
 			  },
 			  {'render':function(data,status,row){
 				    var url = rootURI+"report/downloadScreenZip/"+row.jobId;
- 					return '<div class="actions"><a class="btn btn-sm dark"  href="'+url+'">'+loadProperties("job.action.download",local,rootURI)+'</a></div>'
+ 					return '<div class="actions"><a class="btn btn-sm dark"  href="'+url+'" style="text-decoration: underline">'+loadProperties("job.action.download",local,rootURI)+'</a></div>'
 				}
 			  },
 			  {'render':function(data,status,row){
 				    var str = '';
 				    if(row.type==7){
 					    var url = rootURI+"report/downloadDoctorZip/"+row.jobId;
-						str = '<div class="actions"><a class="btn btn-sm dark"  href="'+url+'">'+loadProperties("job.action.download",local,rootURI)+'</a></div>'
+						str = '<div class="actions"><a class="btn btn-sm dark"  href="'+url+'" style="text-decoration: underline">'+loadProperties("job.action.download",local,rootURI)+'</a></div>'
 				    }
 					return str;
 				}

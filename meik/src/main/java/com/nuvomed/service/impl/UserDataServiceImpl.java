@@ -127,4 +127,18 @@ public class UserDataServiceImpl implements UserDataService{
 				.uniqueResult();		
 				
 	}
+	
+	/**
+	 * 查询指定用户自动生成的csv文件
+	 * @param userId
+	 * @return
+	 */	
+	public TuserData loadCsvFile(int userId) {
+		Criteria criteria=UserDataDao.createCriteria();
+		return (TuserData) criteria.add(Restrictions.eq("userId", userId))
+				.add(Restrictions.eq("dataType", 6))
+				.addOrder(Order.desc("dataId"))
+				.uniqueResult();		
+				
+	}
 }

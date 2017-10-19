@@ -144,7 +144,7 @@ INSERT INTO `nuvo_admin_nodes` VALUES ('14', '8192', 'Group Page', '/group', 'GE
 INSERT INTO `nuvo_admin_nodes` VALUES ('15', '16384', 'Group List', '/group/groupList', 'GET', '1', '\0', '', 'System Management', '14', '', '');
 INSERT INTO `nuvo_admin_nodes` VALUES ('16', '32768', 'Add Group Functions', '/group/*', 'ALL', '1', '\0', '', 'System Management', '15', '', '');
 INSERT INTO `nuvo_admin_nodes` VALUES ('17', '65536', 'GroupUser Page', '/groupuser', 'GET', '1', '\0', '', 'System Management', '16', '', '');
-INSERT INTO `nuvo_admin_nodes` VALUES ('18', '134072', 'GroupUser List', '/groupuser/groupUserList/*', 'GET', '1', '\0', '', 'System Management', '17', '', '');
+INSERT INTO `nuvo_admin_nodes` VALUES ('18', '131072', 'GroupUser List', '/groupuser/groupUserList/*', 'GET', '1', '\0', '', 'System Management', '17', '', '');
 INSERT INTO `nuvo_admin_nodes` VALUES ('19', '262144', 'All GroupUser Functions', '/groupuser/*', 'ALL', '1', '\0', '', 'System Management', '18', '', '');
 INSERT INTO `nuvo_admin_nodes` VALUES ('20', '524288', 'User Profile', '/userprofile', 'GET', '1', '\0', '', 'System Management', '19', '', '');
 INSERT INTO `nuvo_admin_nodes` VALUES ('21', '1048576', 'All Profile Functions', '/userprofile/*', 'ALL', '1', '\0', '', 'System Management', '20', '', '');

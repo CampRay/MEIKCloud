@@ -1,6 +1,8 @@
 package com.nuvomed.dao;
 
 import java.util.List;
+
+import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
 
 import com.nuvomed.dao.base.BaseDao;
@@ -21,11 +23,18 @@ public class UserDataDao extends BaseDao<TuserData> {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<TuserData> findUserDataWithoutSteam(int userId,int dataType){
-		return this.findByHqlName("findUserData", new Integer[]{userId,dataType});		
+		Query query = this.currentSession().createQuery("select new TuserData(ud.dataId,ud.userId,ud.fileName,ud.dataType) from TuserData ud where ud.userId=:userId and ud.dataType=:dataType");
+		query.setInteger("userId", userId);
+		query.setInteger("dataType", dataType);
+		return query.list();
+//		return this.findByHqlName("findUserData", new Integer[]{userId,dataType});		
 	}	
 	
 	@SuppressWarnings("unchecked")
 	public List<TuserData> findUserDataWithoutSteam(int userId){
-		return this.findByHqlName("findAllUserData", new Integer[]{userId});		
+		Query query = this.currentSession().createQuery("select new TuserData(ud.dataId,ud.userId,ud.fileName,ud.dataType) from TuserData ud where ud.userId= :userId");
+		query.setInteger("userId", userId);
+		return query.list();
+//		return this.findByHqlName("findAllUserData", new Integer[]{userId});		
 	}
 }

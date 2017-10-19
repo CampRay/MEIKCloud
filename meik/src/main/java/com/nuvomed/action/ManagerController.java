@@ -127,28 +127,35 @@ public class ManagerController extends BaseController {
 		TadminUser ad=getSessionUser(request);
 		JSONObject respJson = new JSONObject();
 		Date sdate = null;
-		try{
-			try {
-				String ss=adminuser.getCreatedTimeStr();
-				sdate = simpleDateFormat.parse(ss);
-			} catch (ParseException e) {
-				e.printStackTrace();
+		TadminUser dbAdminUser=adminUserService.getAdminUserById(adminuser.getAdminId());
+		if(dbAdminUser!=null){					
+			try{
+				try {
+					String ss=adminuser.getCreatedTimeStr();
+					sdate = simpleDateFormat.parse(ss);
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+				dbAdminUser.setCreatedTime(sdate.getTime());
+				dbAdminUser.setUpdatedBy(ad.getAdminId());
+				dbAdminUser.setUpdatedTime(System.currentTimeMillis());			
+				if(adminuser.getPassword()!=null&&!adminuser.getPassword().isEmpty()){
+					dbAdminUser.setPassword(SecurityTools.SHA1(adminuser.getPassword()));
+				}
+				
+				dbAdminUser.setAdminRole(adminRoleService.getAdminRoleById(adminuser.getAdminRole().getRoleId()));
+				adminUserService.updateAdminUser(dbAdminUser);
+				respJson.put("status", true);
 			}
-			adminuser.setCreatedTime(sdate.getTime());
-			adminuser.setUpdatedBy(ad.getAdminId());
-			adminuser.setUpdatedTime(System.currentTimeMillis());			
-			if(adminuser.getPassword()!=null){
-			adminuser.setPassword(SecurityTools.SHA1(adminuser.getPassword()));
-			}else {
-			adminuser.setPassword(adminUserService.getAdminUserById(adminuser.getAdminId()).getPassword());
-			}
-			adminUserService.updateAdminUser(adminuser);
-			respJson.put("status", true);
+			catch(MyException be){
+				respJson.put("status", false);
+				respJson.put("info", getMessage(request,be.getErrorID(),be.getMessage()));
+			}	
 		}
-		catch(MyException be){
+		else{
 			respJson.put("status", false);
-			respJson.put("info", getMessage(request,be.getErrorID(),be.getMessage()));
-		}	
+			respJson.put("info", "The user do not exist or have been deleted!");
+		}
 		String str=JSON.toJSONString(respJson);		
 		return str;
 	}

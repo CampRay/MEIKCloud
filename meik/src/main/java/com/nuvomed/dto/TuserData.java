@@ -18,11 +18,16 @@ public class TuserData implements Serializable {
 
 	private byte[] stream;	
 	
-	//数据文件类型：1 screening数据；2 医生report 数据;3 系统医生report数据; 4 pdf报告
+	//数据文件类型：1 screening数据；2 医生report 数据;3 系统医生report数据; 4 pdf报告, 5 screen自動報告
 	private int dataType;
 		
-
-	public TuserData() {
+	public TuserData(){}
+	public TuserData(int dataId,int userId,String fileName,int dataType) {
+		this.dataId=dataId;
+		this.userId=userId;
+		this.fileName=fileName;
+		this.dataType=dataType;
+		
 	}
 
 	public int getDataId() {

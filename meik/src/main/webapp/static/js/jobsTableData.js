@@ -78,15 +78,20 @@ var JobsTable = function () {
 			   {'render':function(data,status,row){
 				   		var str = '';
 	                    if(row.screenResult!=null){
-	                    	var result=loadProperties("job.screen.result.normal",local,rootURI);
+	                    	var url = rootURI+"jobs/downloadScreenPdf/"+row.jobId;
+	                    	var result="";
+	                    	if(row.screenResult==0){
+	                    		result=loadProperties("job.screen.result.normal",local,rootURI);
+	                    		str = '<div class="actions">'+result+": "+'<a class="btn btn-sm dark"  href="'+url+'">PDF</a></div>'
+	                    	}
 	                    	if(row.screenResult==1){
 	                    		result=loadProperties("job.screen.result.benign",local,rootURI);
+	                    		str = '<div class="actions">'+result+": "+'<a class="btn btn-sm dark"  href="'+url+'">PDF</a></div>'
 	                    	}
 	                    	else if(row.screenResult==2){
 	                    		result=loadProperties("job.screen.result.suspicious",local,rootURI);
-	                    	}	                    	
-	                    	var url = rootURI+"jobs/downloadScreenPdf/"+row.jobId;
-		   					str = '<div class="actions">'+result+": "+'<a class="btn btn-sm dark"  href="'+url+'">PDF</a></div>'
+	                    		str = '<div class="actions">'+result+": "+'<a class="btn btn-sm dark"  href="'+url+'">PDF</a></div>'
+	                    	}	                    			   					
 	                    }		   						   				
 		   				return str;
    					}
@@ -172,6 +177,38 @@ var JobsTable = function () {
 					 }
 					 else{
 						 handleAlerts("Failed to delete the data. Exception Message: " +data.info,"danger","");
+					 }
+				}             	 
+             },
+             "error":function(XMLHttpRequest, textStatus, errorThrown){
+            	 alert(errorThrown);
+             }
+           });
+        });  
+		
+		//打开执行生成pdf对话框前判断是否已选择要执行的行
+		$("#openPdfJobsModal").on("click",function(event){
+			if(selected.length==0){
+				handleAlerts(loadProperties("error.jobs.select.pdf",local,rootURI),"warning","");				
+				return false;
+			}
+		});
+		
+		//确认执行生成pdf操作
+		$('#pdfBtn').on('click', function (e) {
+			$.ajax( {
+             "dataType": 'json', 
+             "type": "GET", 
+             "url": rootURI+"jobs/autoPdf/"+selected.join(), 
+             "success": function(data,status){
+            	 if(status == "success"){					
+					 if(data.status){
+						 selected=[];						 
+		            	 oTable.api().draw();
+		            	 oTable.$('th span').removeClass();
+					 }
+					 else{
+						 handleAlerts("Failed to create the PDF resport. Exception Message: " +data.info,"danger","");
 					 }
 				}             	 
              },

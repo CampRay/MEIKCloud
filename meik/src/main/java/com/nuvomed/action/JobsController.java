@@ -2,57 +2,49 @@ package com.nuvomed.action;
 
 import java.io.BufferedOutputStream;
 import java.io.OutputStream;
-import java.net.URLEncoder;
-import java.util.List;
-import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.nuvomed.commons.ConvertTools;
 import com.nuvomed.commons.EMailTool;
 import com.nuvomed.commons.MyException;
+import com.nuvomed.core.MultiThreadHandler;
 import com.nuvomed.dto.TadminJob;
 import com.nuvomed.dto.TadminUser;
 import com.nuvomed.dto.TemaiMessage;
-import com.nuvomed.dto.Tlanguage;
-import com.nuvomed.dto.Tlicense;
-import com.nuvomed.dto.Tuser;
 import com.nuvomed.dto.TuserData;
 import com.nuvomed.model.DataTableParamter;
 import com.nuvomed.model.PagingData;
 import com.nuvomed.service.AdminJobService;
 import com.nuvomed.service.AdminUserService;
-import com.nuvomed.service.LanguageService;
-import com.nuvomed.service.LicenseService;
 import com.nuvomed.service.UserDataService;
 
 
 @Controller
 @RequestMapping("/jobs")
 public class JobsController extends BaseController{
-	private Logger logger = Logger.getLogger(JobsController.class);
-	@Autowired
-	private LanguageService languageService;
+	private Logger logger = Logger.getLogger(JobsController.class);	
 	@Autowired
 	private AdminJobService adminJobService;
 	@Autowired
 	private AdminUserService adminUserService;
 	@Autowired
 	private UserDataService userDataService;
+	@Autowired
+	private ThreadPoolTaskExecutor taskExecutor;
 	
 	@RequestMapping(method=RequestMethod.GET)
 	public ModelAndView jobs(HttpServletRequest request){
@@ -76,12 +68,7 @@ public class JobsController extends BaseController{
 		TadminUser tUser=getSessionUser(request);		
 		if(tUser!=null){
 			PagingData pagingData=null;
-			if(tUser.getAdminRole().getRoleId()==1){
-				pagingData=adminJobService.loadAdminJobList(dtp,null);
-			}
-			else{
-				pagingData=adminJobService.loadAdminJobList(dtp,tUser.getAdminId());
-			}
+			pagingData=adminJobService.loadAdminJobList(dtp,tUser);
 			
 			pagingData.setSEcho(dtp.sEcho);
 			if(pagingData.getAaData()==null){
@@ -147,6 +134,29 @@ public class JobsController extends BaseController{
 		try{			
 			adminJobService.deleteAdminJobByIds(idArr);
 			respJson.put("status", true);
+		}
+		catch(MyException be){
+			respJson.put("status", false);
+			respJson.put("info", getMessage(request,be.getErrorID(),be.getMessage()));
+		}	
+		return JSON.toJSONString(respJson);	
+	}
+	
+	@RequestMapping(value="autoPdf/{ids}",method=RequestMethod.GET)
+	@ResponseBody
+	public String autoPdfJobs(@PathVariable String ids,HttpServletRequest request){
+		String[] idstrArr=ids.split(",");		
+		Integer[] idArr=ConvertTools.stringArr2IntArr(idstrArr);		
+		JSONObject respJson = new JSONObject();
+		try{	
+			
+			respJson.put("status", true);
+			for (Integer id : idArr) {
+				TadminJob job=adminJobService.getAdminJobById(id);
+				//启用线程任务处理报告
+				taskExecutor.execute(new MultiThreadHandler(job.getUserId()));
+			}
+			
 		}
 		catch(MyException be){
 			respJson.put("status", false);
@@ -230,6 +240,40 @@ public class JobsController extends BaseController{
         }			
 		return null;
 	}
-		
+	
+	/**
+	 * 下载自动生成的csv文件
+	 * @param response
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value="downloadScreenCsv/{id}",method=RequestMethod.GET)	
+	public String downloadScreenCsv(HttpServletResponse response, @PathVariable String id){
+			
+		TadminJob job=adminJobService.getAdminJobById(Integer.parseInt(id));
+		TuserData userData=userDataService.loadCsvFile(job.getUser().getUserId());		
+							
+		try{
+			if(userData!=null){
+				if(job.getDownloadTime()==null){
+					job.setDownloadTime(System.currentTimeMillis());
+					adminJobService.updateAdminJob(job);
+				}
+				//String fileName=URLEncoder.encode(userData.getFileName(),"UTF-8");
+				
+				response.setHeader("Content-Disposition", "attachment; filename=\"" + userData.getFileName() + "\"");
+				response.addHeader("Content-Length", ""+userData.getStream().length);
+				response.setContentType("application/octet-stream;charset=UTF-8");
+				OutputStream outputStream = new BufferedOutputStream(response.getOutputStream());  
+				outputStream.write(userData.getStream());  
+				outputStream.flush();  	
+				outputStream.close();
+			}
+			
+		}catch (Exception e) {
+			
+        }			
+		return null;
+	}
 	
 }

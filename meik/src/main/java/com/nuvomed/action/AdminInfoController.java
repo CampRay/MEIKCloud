@@ -179,7 +179,7 @@ public class AdminInfoController extends BaseController {
 			response.setDateHeader("Expires", 0);
 			response.setContentType("image/jpeg");
 			ByteArrayInputStream bin;
-			if(adminInfo.getAvatar() == null){
+			if(adminInfo==null||adminInfo.getAvatar() == null){
 				File file = new File(request.getSession().getServletContext().getRealPath("/")+File.separator+"static"+File.separator+"images"+File.separator+"profile.jpg");
 			    FileImageInputStream inputStream = new FileImageInputStream(file);
 				byte [] avatar=new byte[1048576];

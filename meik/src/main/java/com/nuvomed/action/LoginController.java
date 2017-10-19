@@ -109,7 +109,7 @@ public class LoginController extends BaseController {
 			request.getSession().setAttribute("locale", locale);
 			
 			if(StringUtils.isEmpty(toUrl)){
-				if(tUser.getAdminRole().getRoleId()!=4){
+				if(tUser.getAdminRole().getRoleId()!=5){
 					toUrl="/jobs";
 				}
 				else{					

@@ -3,24 +3,15 @@
 	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>  
+    <!-- 數據庫原始SQL語句查詢 -->
   <sql-query name="findUserData">
-  	<return alias="ud" class="com.nuvomed.dto.TuserData">
-  	  <return-property name="dataId" column="dataId"/>
-      <return-property name="userId" column="userId"/>   
-      <return-property name="fileName" column="fileName"/>
-      <return-property name="dataType" column="dataType"/>     		
-  	</return>
-  	<![CDATA[select ud.dataId AS dataId,ud.userId AS userId,ud.fileName AS fileName,ud.dataType AS dataType from TuserData ud where ud.userId= ? and ud.dataType=?]]>
+  	<return alias="userData" class="com.nuvomed.dto.TuserData"/>   		  	
+  	<![CDATA[select ud.data_id AS {userData.dataId},ud.user_id AS {userData.userId},ud.filename AS {userData.fileName},ud.data_type AS {userData.dataType} from nuvo_user_data ud where ud.user_id= ? and ud.data_type=?]]>
   </sql-query>  
   
   <sql-query name="findAllUserData">
-  	<return alias="ud" class="com.nuvomed.dto.TuserData">
-  	  <return-property name="dataId" column="dataId"/>
-      <return-property name="userId" column="userId"/>   
-      <return-property name="fileName" column="fileName"/>
-      <return-property name="dataType" column="dataType"/>     		
-  	</return>
-  	<![CDATA[select ud.dataId AS dataId,ud.userId AS userId,ud.fileName AS fileName,ud.dataType AS dataType from TuserData ud where ud.userId= ?]]>
+  	<return alias="userData" class="com.nuvomed.dto.TuserData"/>  	  
+  	<![CDATA[select ud.data_id AS {userData.dataId},ud.user_id AS {userData.userId},ud.filename AS {userData.fileName},ud.data_type AS {userData.dataType} from nuvo_user_data ud where ud.user_id= ?]]>
   </sql-query> 
   <!-- 
   <sql-query name="updateUserInfo">  	

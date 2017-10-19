@@ -228,10 +228,12 @@ var ManagersTable = function () {
 	            var email =data.email;
 	            var createby=data.createdBy;
 	            var creatime=data.createdTimeStr;
+	            var roleName=data.roleName;
 	            $("#editUsersForm input[name='adminId']").val(adminId);
 	            $("#editUsersForm input[name='email']").val(email);
 	            $("#editUsersForm input[name='createdBy']").val(createby);
 	            $("#editUsersForm input[name='createdTimeStr']").val(creatime);
+	            $("#editUsersForm select[name='adminRole.roleId']").children("option:contains('"+roleName+"')").attr("selected","true");
 			}
 		});
 				           

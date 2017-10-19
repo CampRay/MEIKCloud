@@ -23,6 +23,15 @@
   <listener>
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
+  <!-- 通过Spring获取项目的根目录的绝对路径，可以随时在bean中用System.getProperty("meik.root")获取系统参数 -->
+  <context-param>
+	  <param-name>webAppRootKey</param-name>
+	  <param-value>meik.root</param-value>
+  </context-param>
+  <listener>     
+	  <listener-class>org.springframework.web.util.WebAppRootListener</listener-class>
+  </listener>
+  
   <servlet>
     <servlet-name>springDispatcher</servlet-name>
     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>

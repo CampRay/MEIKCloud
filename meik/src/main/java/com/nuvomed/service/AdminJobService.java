@@ -43,12 +43,13 @@ public interface AdminJobService {
 	
 	TadminJob loadDownloadedJobByUserCode(String adminId,String code);
 	
-	public PagingData loadAdminJobList(DataTableParamter rdtp,String adminId);
+	public PagingData loadAdminJobList(DataTableParamter rdtp,TadminUser adminUser);
 	
-	PagingData loadDoctorJobList(DataTableParamter rdtp,String adminId); 
-	List<TadminJob> loadDoctorJobList(TadminJob searchObj);
+	PagingData loadDoctorJobList(DataTableParamter rdtp,TadminUser adminUser); 
+	List<TadminJob> loadDoctorJobList(TadminJob searchObj,TadminUser adminUser);
 	
-	List<TadminJob> loadOperatorJobList(TadminJob searchObj,String adminId);	
+	
+	List<TadminJob> loadOperatorJobList(TadminJob searchObj,TadminUser adminUser);	
 		
 	public PagingData loadClientJobList(DataTableParamter rdtp,TadminUser adminUser);
 	

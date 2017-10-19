@@ -47,7 +47,7 @@
 				<!-- BEGIN USER LOGIN DROPDOWN -->
 				<li class="dropdown dropdown-user">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
-					<img alt="" class="img-circle hide1" src="<c:url value="/"/>userprofile/getAvatar"/>
+					<!-- <img alt="" class="img-circle hide1" src="<c:url value="/"/>userprofile/getAvatar"/> -->
 					<span class="username username-hide-on-mobile">
 					${user.adminId} </span>
 					<i class="fa fa-angle-down"></i>

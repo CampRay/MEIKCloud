@@ -3,6 +3,7 @@ package com.nuvomed.api;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -34,8 +36,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.nuvomed.commons.ConvertTools;
 import com.nuvomed.commons.EMailTool;
 import com.nuvomed.commons.SecurityTools;
-import com.nuvomed.commons.StringTool;
 import com.nuvomed.commons.SystemConfig;
+import com.nuvomed.core.MultiThreadHandler;
 import com.nuvomed.dto.TadminJob;
 import com.nuvomed.dto.TadminUser;
 import com.nuvomed.dto.TemaiMessage;
@@ -81,6 +83,8 @@ public class ClientAPI {
 	private RecordsService recordsService;
 	@Autowired
 	private AdminRoleService adminRoleService;
+	@Autowired
+	private ThreadPoolTaskExecutor taskExecutor;
 	
 	
 	
@@ -324,20 +328,104 @@ public class ClientAPI {
 			InputStream inputStream = file.getInputStream();
 			byte [] fileBytes=ConvertTools.toByteArray(inputStream);	
 			userData.setFileName(file.getOriginalFilename());
-			userData.setStream(fileBytes);	
+			userData.setStream(fileBytes);				
 			userData.setDataType(1);
-			userData.setUserId(user.getUserId());				
-			
+			userData.setUserId(user.getUserId());										
 			
 			adminJobService.createScreenData(user, userData,clientNumber,admin.getAdminId());
 			respJson.put("status", 1);
-			
+			if(user.getResult()!=null&&user.getResult()==-1){
+				taskExecutor.execute(new MultiThreadHandler(user));
+			}
+																					
 		}catch (Exception e) {		
 			respJson.put("status", 0);	
 			respJson.put("info", "Failed to upload data."+e.getMessage());
 			return JSON.toJSONString(respJson);
 		}
 		return JSON.toJSONString(respJson);
+		
+	}
+	
+	
+	/**
+	 * MEIK Screen上传用户检查数据接口
+	 * @param request
+	 * @param token
+	 * @param jsonStr
+	 * @param file
+	 * @return
+	 */
+	@RequestMapping(value="/sendScreenData",method=RequestMethod.POST)
+	@ResponseBody
+	public String sendScreenData(HttpServletRequest request,@RequestHeader("Authorization") String token,String jsonStr,@RequestParam(value = "file", required = false) MultipartFile file){
+		TadminUser admin=adminUserService.getTadminUsersByToken(token);
+		JSONObject respJson = new JSONObject();	
+		if (admin== null) {
+			respJson.put("status", 0);	
+			respJson.put("info", "The user is not logged in or has an invalid session.");
+			return JSON.toJSONString(respJson);
+		}
+		
+		JSONObject jsonObj = (JSONObject) JSON.parse(jsonStr);
+		if (jsonObj.getString("code")== null ||jsonObj.getString("code").isEmpty()) {
+			respJson.put("status", 0);			
+			return JSON.toJSONString(respJson);
+		}
+		TadminJob adminJob=adminJobService.getAdminJobByCode(jsonObj.getString("code"));
+		if(adminJob!=null){					
+			respJson.put("status", 0);	
+			respJson.put("info", "The MEIK screen data of client "+jsonObj.getString("code")+" already is uploaded, shouldn't repeat upload the screen data.");
+			return JSON.toJSONString(respJson);
+		}
+		else{
+			adminJob=new TadminJob();
+		}
+								
+		
+		try{
+										
+			Tuser user=new Tuser();
+			TuserData userData=new TuserData();			
+			
+			String clientNumber=jsonObj.getString("clientnumber");
+			user.setCid(jsonObj.getString("cid"));
+			if(user.getCid()!=null&&!user.getCid().isEmpty()){
+				TadminUser newAccount=adminUserService.getAdminUserById(user.getCid());
+				user.setAdminUser(newAccount);
+			}
+			user.setCode(jsonObj.getString("code"));		
+			user.setFirstName(jsonObj.getString("firstname"));
+			user.setLastName(jsonObj.getString("lastname"));		
+			user.setOtherName(jsonObj.getString("othername"));
+			user.setBirthday(jsonObj.getString("birthday"));
+			user.setMobile(jsonObj.getString("mobile"));	
+			user.setEmail(jsonObj.getString("email"));
+			user.setFree(jsonObj.getBoolean("free"));						
+			user.setLocation(jsonObj.getString("venue"));
+			user.setResult(jsonObj.getInteger("result"));
+			user.setGender(true);
+			user.setCreatedBy(admin.getAdminId());
+									
+			//保存上传数据到数据库						
+			userData.setFileName(file.getOriginalFilename());			
+			userData.setStream(file.getBytes());
+			userData.setDataType(1);
+			userData.setUserId(user.getUserId());										
+			
+			adminJobService.createScreenData(user, userData,clientNumber,admin.getAdminId());
+			respJson.put("status", 1);
+			
+			//启用线程任务处理报告
+			taskExecutor.execute(new MultiThreadHandler(user));
+			return JSON.toJSONString(respJson);
+															
+			
+		}catch (Exception e) {		
+			respJson.put("status", 0);	
+			respJson.put("info", "Failed to upload data."+e.getMessage());
+			return JSON.toJSONString(respJson);
+		}				
 	}
 	
 	/**
@@ -371,18 +459,25 @@ public class ClientAPI {
 		}
 		
 		Tuser user=adminJob.getUser();		
-		//保存上传数据
-		TuserData userData=new TuserData();
-		InputStream inputStream;
-		try {
-			inputStream = file.getInputStream();
-			byte [] fileBytes=ConvertTools.toByteArray(inputStream);
-					
-			userData.setFileName(file.getOriginalFilename());
-			userData.setStream(fileBytes);	
-			userData.setUserId(user.getUserId());
-			userData.setDataType(5);
-			userDataService.createUserData(userData);
+		//保存上传数据		
+		try {	
+			TuserData userDataPDF=userDataService.loadScreenPdfReport(user.getUserId());
+			boolean noRecord=(userDataPDF==null);
+			if(noRecord){
+				userDataPDF=new TuserData();								
+				
+			}				
+			userDataPDF.setFileName(file.getOriginalFilename());
+			userDataPDF.setStream(file.getBytes());	
+			userDataPDF.setUserId(user.getUserId());
+			userDataPDF.setDataType(5);
+			if(noRecord){
+				userDataService.createUserData(userDataPDF);
+			}
+			
+			else{					
+				userDataService.updateUserData(userDataPDF);
+			}																
 		} catch (Exception e) {			
 			respJson.put("status", 0);
 			respJson.put("info", "Failed to upload file.");
@@ -395,6 +490,65 @@ public class ClientAPI {
 			adminJob.setCloseTime(System.currentTimeMillis());
 			adminJobService.updateAdminJob(adminJob);
 		}		
+		
+		respJson.put("status", 1);	
+		return JSON.toJSONString(respJson);
+	}
+	
+	/**
+	 * 管理員上传手動生成的Csv报告接口
+	 * @param request
+	 * @param token
+	 * @param jsonStr
+	 * @param file
+	 * @return
+	 */
+	@RequestMapping(value="/sendScreenCsv",method=RequestMethod.POST)
+	@ResponseBody
+	public String sendScreenCsv(HttpServletRequest request,@RequestHeader("Authorization") String token,String jsonStr,@RequestParam(value = "file", required = false) MultipartFile file){
+		TadminUser admin=adminUserService.getTadminUsersByToken(token);
+		JSONObject respJson = new JSONObject();	
+		if (admin== null) {
+			respJson.put("status", 0);	
+			respJson.put("info", "The user is not logged in or has an invalid session.");
+			return JSON.toJSONString(respJson);
+		}
+		
+		JSONObject jsonObj = (JSONObject) JSON.parse(jsonStr);		
+		String code=jsonObj.getString("code");			
+		TadminJob adminJob=adminJobService.getAdminJobByCode(code);
+		//判断是否已经上传过数据
+		if(adminJob==null){
+			respJson.put("status", 0);
+			respJson.put("info", "Could not find the user data.");
+			return JSON.toJSONString(respJson);
+		}
+		
+		Tuser user=adminJob.getUser();		
+				
+		//保存上传数据						
+		try {
+			TuserData userDataCSV=userDataService.loadCsvFile(user.getUserId());
+			boolean noRecord=(userDataCSV==null);
+			if(noRecord){
+				userDataCSV=new TuserData();											
+			}
+			userDataCSV.setFileName(user.getCode()+".csv");
+			userDataCSV.setStream(file.getBytes());	
+			userDataCSV.setUserId(user.getUserId());
+			userDataCSV.setDataType(6);
+			if(noRecord){
+				userDataService.createUserData(userDataCSV);
+		    }
+			else{					
+				userDataService.updateUserData(userDataCSV);
+			}	
+		} catch (Exception e) {			
+			respJson.put("status", 0);
+			respJson.put("info", "Failed to upload file.");
+			return JSON.toJSONString(respJson);
+		}
+		
 		
 		respJson.put("status", 1);	
 		return JSON.toJSONString(respJson);
@@ -440,7 +594,7 @@ public class ClientAPI {
 		//判断是否是系统医生
 		if(doctorId!=null&&!doctorId.isEmpty()){
 			int dataType=2;
-			if(admin.getAdminId().equals(doctorId)){				
+			if(admin.getAdminId().equals(doctorId)||admin.getAdminRole().getRoleId()==4){//如果是系統醫生或報告管理員				
 				dataType=3;				
 				if(adminJob.getType()==3){
 					adminJob.setDoneTime(System.currentTimeMillis());
@@ -460,7 +614,7 @@ public class ClientAPI {
 				}
 				catch(Exception e){}
 			}
-			else{
+			else{//否則是普通醫生
 				dataType=2;
 				//设置任务状态为等待系统医生下载状态
 				adminJob.setDoneTime(System.currentTimeMillis());

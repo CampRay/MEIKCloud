@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
 	 * @return 
 	 * @see com.bps.service.UserService#getUserById(java.lang.String) 
 	 */
-	public Tuser getUserById(String userId) {
+	public Tuser getUserById(int userId) {
 		return userDao.get(userId);	
 	}
 

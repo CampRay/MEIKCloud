@@ -37,47 +37,47 @@ public class GroupServiceImpl implements GroupService {
 	@Autowired
 	private GroupDao groupDao;
 
-	@Override
+	
 	public Tgroup getGroupById(int id) {
 		return groupDao.get(id);
 	}
 
-	@Override
+	
 	public List<Tgroup> getAllGroups() {
 		return groupDao.findBy("deleted", false);
 	}
 
-	@Override
+	
 	public void createGroup(Tgroup group) {
 		groupDao.create(group);		
 	}
 
-	@Override
+	
 	public void updateGroup(Tgroup group) {
 		groupDao.update(group);
 	}
 
-	@Override
+	
 	public void deleteGroup(Tgroup group) {
 		groupDao.delete(group);		
 	}
 
-	@Override
+	
 	public void deleteGroupById(int id) {
 		groupDao.delete(id);
 	}
 
-	@Override
+	
 	public void deleteGroupsByIds(Integer[] ids) {
 		groupDao.deleteAll(ids);
 	}
 	
-	@Override
+	
 	public Tgroup loadGroupByName(String groupName) {
 		return groupDao.findUnique("groupName", groupName);
 	}
 
-	@Override
+	
 	public PagingData loadGroupsList(DataTableParamter rdtp) {
 		String searchJsonStr=rdtp.getsSearch();
 		if(searchJsonStr!=null&&!searchJsonStr.isEmpty()){

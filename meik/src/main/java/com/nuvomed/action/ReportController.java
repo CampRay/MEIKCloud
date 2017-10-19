@@ -64,9 +64,7 @@ public class ReportController extends BaseController{
 		TadminUser tUser=getSessionUser(request);		
 		if(tUser!=null){
 			PagingData pagingData=null;
-			if(tUser.getAdminRole().getRoleId()==1){
-				pagingData=adminJobService.loadDoctorJobList(dtp,null);
-			}			
+			pagingData=adminJobService.loadDoctorJobList(dtp,tUser);		
 			if(pagingData!=null){
 				pagingData.setSEcho(dtp.sEcho);
 				if(pagingData.getAaData()==null){
@@ -94,7 +92,7 @@ public class ReportController extends BaseController{
 			adminJob.setStartTime(request.getParameter("startTime"));
 			adminJob.setEndTime(request.getParameter("endTime"));
 			List<TadminJob> jobList=new ArrayList<TadminJob>();
-			jobList=adminJobService.loadDoctorJobList(adminJob);									
+			jobList=adminJobService.loadDoctorJobList(adminJob,tUser);									
 			//创建HSSFWorkbook对象  
 			HSSFWorkbook wkb = new HSSFWorkbook();  
 			//创建HSSFSheet对象  
@@ -196,12 +194,7 @@ public class ReportController extends BaseController{
 		TadminUser tUser=getSessionUser(request);		
 		if(tUser!=null){
 			PagingData pagingData=null;
-			if(tUser.getAdminRole().getRoleId()==1){
-				pagingData=adminJobService.loadAdminJobList(dtp,null);
-			}
-			else{
-				pagingData=adminJobService.loadAdminJobList(dtp,tUser.getAdminId());
-			}
+			pagingData=adminJobService.loadAdminJobList(dtp,tUser);
 			if(pagingData!=null){
 				pagingData.setSEcho(dtp.sEcho);
 				if(pagingData.getAaData()==null){
@@ -217,13 +210,9 @@ public class ReportController extends BaseController{
 	
 	@RequestMapping(value="/operator/excel",method=RequestMethod.POST)	
 	public String operatorExcel(HttpServletRequest request,HttpServletResponse response){		
-		TadminUser tUser=getSessionUser(request);
-		String adminId=null;
-		if(tUser.getAdminRole().getRoleId()!=1){
-			adminId=tUser.getAdminId();
-		}
+		TadminUser tUser=getSessionUser(request);		
 		if(tUser!=null){
-			TadminJob adminJob=new TadminJob();
+			TadminJob adminJob=new TadminJob();			
 			adminJob.setCode(request.getParameter("code"));
 			adminJob.setCreatedBy(request.getParameter("createdBy"));
 			if(!request.getParameter("type").isEmpty()){
@@ -234,7 +223,7 @@ public class ReportController extends BaseController{
 			adminJob.setEndTime(request.getParameter("endTime"));
 			List<TadminJob> jobList=new ArrayList<TadminJob>();
 			
-			jobList=adminJobService.loadOperatorJobList(adminJob,adminId);									
+			jobList=adminJobService.loadOperatorJobList(adminJob,tUser);									
 			//创建HSSFWorkbook对象  
 			HSSFWorkbook wkb = new HSSFWorkbook();  
 			//创建HSSFSheet对象  
