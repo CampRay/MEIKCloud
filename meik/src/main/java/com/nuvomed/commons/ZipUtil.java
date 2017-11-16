@@ -20,9 +20,10 @@ public class ZipUtil {
 	 * @param srcRootDir 压缩文件夹根目录的子路径
 	 * @param file 当前递归压缩的文件或目录对象
 	 * @param zos 压缩文件存储对象
+	 * @param filter 只压缩指定后缀名的文件  如：“.jpg|.pdf”
 	 * @throws Exception
 	 */
-	private static void zip(String srcRootDir, File file, ZipOutputStream zos) throws Exception
+	private static void zip(String srcRootDir, File file, ZipOutputStream zos, String filter) throws Exception
 	{
 		if (file == null) 
 		{
@@ -31,25 +32,32 @@ public class ZipUtil {
 		
 		//如果是文件，则直接压缩该文件
 		if (file.isFile())
-		{			
-			int count, bufferLen = 1024;
-			byte data[] = new byte[bufferLen];
-			
-			//获取文件相对于压缩文件夹根目录的子路径
-			String subPath = file.getAbsolutePath();
-			int index = subPath.indexOf(srcRootDir);
-			if (index != -1) 
-			{
-				subPath = subPath.substring(srcRootDir.length() + File.separator.length());
-			}
-			ZipEntry entry = new ZipEntry(subPath);
-			zos.putNextEntry(entry);
-			BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
-			while ((count = bis.read(data, 0, bufferLen)) != -1) 
-			{
-				zos.write(data, 0, count);
-			}
-			bis.close();
+		{	
+			//判断文件是否是指定后缀名的文件
+			String[] filterArr=filter.split("|");
+			for (String suffix : filterArr) {
+				if(file.getName().endsWith(suffix.trim())){
+					int count, bufferLen = 1024;
+					byte data[] = new byte[bufferLen];
+					
+					//获取文件相对于压缩文件夹根目录的子路径
+					String subPath = file.getAbsolutePath();
+					int index = subPath.indexOf(srcRootDir);
+					if (index != -1) 
+					{
+						subPath = subPath.substring(srcRootDir.length() + File.separator.length());
+					}
+					ZipEntry entry = new ZipEntry(subPath);
+					zos.putNextEntry(entry);
+					BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+					while ((count = bis.read(data, 0, bufferLen)) != -1) 
+					{
+						zos.write(data, 0, count);
+					}
+					bis.close();
+					break;
+				}
+			}									
 			zos.closeEntry();
 		}
 		//如果是目录，则压缩整个目录
@@ -59,8 +67,8 @@ public class ZipUtil {
 			File[] childFileList = file.listFiles();
 			for (int n=0; n<childFileList.length; n++)
 			{
-				childFileList[n].getAbsolutePath().indexOf(file.getAbsolutePath());
-				zip(srcRootDir, childFileList[n], zos);
+				//childFileList[n].getAbsolutePath().indexOf(file.getAbsolutePath());
+				zip(srcRootDir, childFileList[n], zos,filter);
 			}
 		}
 	}
@@ -70,9 +78,10 @@ public class ZipUtil {
 	 * @param srcPath 要压缩的源文件路径。如果压缩一个文件，则为该文件的全路径；如果压缩一个目录，则为该目录的顶层目录路径
 	 * @param zipPath 压缩文件保存的路径。注意：zipPath不能是srcPath路径下的子文件夹
 	 * @param zipFileName 压缩文件名
+	 * @param filter 只压缩指定后缀名的文件  如：“.jpg|.pdf”
 	 * @throws Exception
 	 */
-	public static void zip(String srcPath, String zipPath, String zipFileName) throws Exception
+	public static void zip(String srcPath, String zipPath, String zipFileName, String filter) throws Exception
 	{
 		if (srcPath==null || zipPath==null || zipFileName==null)
 		{
@@ -123,7 +132,7 @@ public class ZipUtil {
 				}
 			}
 			//调用递归压缩方法进行目录或文件压缩
-			zip(srcRootDir, srcFile, zos);
+			zip(srcRootDir, srcFile, zos,filter);
 			zos.flush();
 		}
 		catch (Exception e) 
@@ -318,7 +327,7 @@ public class ZipUtil {
 		String zipFileName = "test.zip";
 		try
 		{
-			zip(dir, zipPath, zipFileName);
+			zip(dir, zipPath, zipFileName,".jpg|.pdf");
 		} 
 		catch (Exception e)
 		{

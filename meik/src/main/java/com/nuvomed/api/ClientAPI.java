@@ -3,7 +3,6 @@ package com.nuvomed.api;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
@@ -36,6 +35,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.nuvomed.commons.ConvertTools;
 import com.nuvomed.commons.EMailTool;
 import com.nuvomed.commons.SecurityTools;
+import com.nuvomed.commons.StringTool;
 import com.nuvomed.commons.SystemConfig;
 import com.nuvomed.core.MultiThreadHandler;
 import com.nuvomed.dto.TadminJob;
@@ -49,6 +49,7 @@ import com.nuvomed.dto.TuserInfo;
 import com.nuvomed.service.AdminJobService;
 import com.nuvomed.service.AdminRoleService;
 import com.nuvomed.service.AdminUserService;
+import com.nuvomed.service.GroupUserService;
 import com.nuvomed.service.LanguageService;
 import com.nuvomed.service.LicenseService;
 import com.nuvomed.service.RecordsService;
@@ -83,6 +84,8 @@ public class ClientAPI {
 	private RecordsService recordsService;
 	@Autowired
 	private AdminRoleService adminRoleService;
+	@Autowired
+	private GroupUserService groupUserService;
 	@Autowired
 	private ThreadPoolTaskExecutor taskExecutor;
 	
@@ -349,7 +352,7 @@ public class ClientAPI {
 	
 	
 	/**
-	 * MEIK Screen上传用户检查数据接口
+	 * MEIK Screen上传用户检查数据接口(未使用)
 	 * @param request
 	 * @param token
 	 * @param jsonStr
@@ -380,8 +383,7 @@ public class ClientAPI {
 		}
 		else{
 			adminJob=new TadminJob();
-		}
-								
+		}								
 		
 		try{
 										
@@ -412,7 +414,7 @@ public class ClientAPI {
 			userData.setStream(file.getBytes());
 			userData.setDataType(1);
 			userData.setUserId(user.getUserId());										
-			
+			//創建job並分配給所在組的管理員，如果所在組沒有管理員，則分配給系統醫生
 			adminJobService.createScreenData(user, userData,clientNumber,admin.getAdminId());
 			respJson.put("status", 1);
 			
@@ -477,7 +479,10 @@ public class ClientAPI {
 			
 			else{					
 				userDataService.updateUserData(userDataPDF);
-			}																
+			}	
+			user.setMissingData(true);
+			user.setResult(result);
+			userService.updateUser(user);
 		} catch (Exception e) {			
 			respJson.put("status", 0);
 			respJson.put("info", "Failed to upload file.");
@@ -533,7 +538,7 @@ public class ClientAPI {
 			if(noRecord){
 				userDataCSV=new TuserData();											
 			}
-			userDataCSV.setFileName(user.getCode()+".csv");
+			userDataCSV.setFileName(file.getOriginalFilename());
 			userDataCSV.setStream(file.getBytes());	
 			userDataCSV.setUserId(user.getUserId());
 			userDataCSV.setDataType(6);
@@ -619,9 +624,19 @@ public class ClientAPI {
 				//设置任务状态为等待系统医生下载状态
 				adminJob.setDoneTime(System.currentTimeMillis());
 				adminJob.setType(5);
-				try{
+				try{					
+					//查询操作员所在组的系统医生（报表管理员）帐号		
+					List<TadminUser> systemDocotrList=groupUserService.getGroupManagerIdsByUser(adminJob.getCreatedBy());
+					TadminUser systemDoctor=null;
+					if(systemDocotrList.size()>0){
+						systemDoctor=systemDocotrList.get(0);						
+					}
+					else{//如果用户组中没有管理員帐号，则指定Screen数据给系统配置的系统医生						
+						systemDoctor=adminUserService.getAdminUserById(doctorId);						
+					}
+					
 					//发送通知电邮
-					TadminUser systemDoctor=adminUserService.getAdminUserById(doctorId);
+					//TadminUser systemDoctor=adminUserService.getAdminUserById(doctorId);
 					if(systemDoctor.getAdminInfo()==null||systemDoctor.getAdminInfo().getNotify()){					
 						TemaiMessage message=new TemaiMessage();
 						message.setTo(systemDoctor.getEmail());
@@ -846,43 +861,50 @@ public class ClientAPI {
 		JSONObject dataJson = new JSONObject();	
 		JSONArray jobArr=new JSONArray();
 		String doctorId=SystemConfig.Admin_Setting_Map.get("System_Doctor_Id");
-		if(admin.getAdminId().equals(doctorId)){
-			List<TadminJob> jobList=adminJobService.loadReportAssignedJobList();			
-			if(jobList.size()>0){
-				for (TadminJob doctorJob : jobList) {	
-					JSONObject jobJson = new JSONObject();	
-					Tuser user=doctorJob.getUser();
-					jobJson.put("code", user.getCode());
-					jobJson.put("firstname", user.getFirstName());
-					jobJson.put("lastname", user.getLastName());
-					jobJson.put("othername", user.getOtherName());
-					jobJson.put("jobid", doctorJob.getJobId());
-					
-					JSONArray fileArr=new JSONArray();
-					//这里因为一次加载太多数据文件到内存，出错错误，所以这里需要优化一下，不要把数据流也加载进来
-					List<TuserData> userDataList=userDataService.loadUserReportDataList(user.getUserId());
-					for (TuserData tuserData : userDataList) {
-						JSONObject jsonObj = new JSONObject();								
-						jsonObj.put("fileid", tuserData.getDataId());
-						jsonObj.put("filename", tuserData.getFileName());
-						fileArr.add(jsonObj);
-					}
-					jobJson.put("files", fileArr);
-					jobArr.add(jobJson);
+		
+		List<TadminJob> jobList=null;
+		//如果是系統醫生或组管理员
+		if(admin.getAdminId().equals(doctorId)||admin.getAdminRole().getRoleId()==4){
+			jobList=adminJobService.loadAdminJobList(admin.getAdminId(),5);					
+		}
+		else{				
+			respJson.put("status", 0);
+			respJson.put("info", "Please logon with system doctor or group manager account.");
+			return JSON.toJSONString(respJson);
+			
+		}
+		//把要下载的数据列表封装到Json中
+		if(jobList!=null&&jobList.size()>0){
+			for (TadminJob doctorJob : jobList) {	
+				JSONObject jobJson = new JSONObject();	
+				Tuser user=doctorJob.getUser();
+				jobJson.put("code", user.getCode());
+				jobJson.put("firstname", user.getFirstName());
+				jobJson.put("lastname", user.getLastName());
+				jobJson.put("othername", user.getOtherName());
+				jobJson.put("jobid", doctorJob.getJobId());
+				
+				JSONArray fileArr=new JSONArray();
+				//这里因为一次加载太多数据文件到内存，出错错误，所以这里需要优化一下，不要把数据流也加载进来
+				List<TuserData> userDataList=userDataService.loadUserReportDataList(user.getUserId());
+				for (TuserData tuserData : userDataList) {
+					JSONObject jsonObj = new JSONObject();								
+					jsonObj.put("fileid", tuserData.getDataId());
+					jsonObj.put("filename", tuserData.getFileName());
+					fileArr.add(jsonObj);
 				}
-				dataJson.put("jobs", jobArr);
-				respJson.put("data", dataJson);
-				respJson.put("status", 1);
+				jobJson.put("files", fileArr);
+				jobArr.add(jobJson);
 			}
-			else{
-				respJson.put("status", 0);	
-				respJson.put("info", "There is no new report data on servier.");
-			}
+			dataJson.put("jobs", jobArr);
+			respJson.put("data", dataJson);
+			respJson.put("status", 1);
 		}
 		else{
-			respJson.put("status", 0);
-			respJson.put("info", "Please logon with system doctor account.");
+			respJson.put("status", 0);	
+			respJson.put("info", "No new report data on servier.");
 		}
+		
 		return JSON.toJSONString(respJson);
 	}
 	
@@ -1072,6 +1094,7 @@ public class ClientAPI {
 	}
 
 	/**
+	 * 下載最新版本的MEIK程序
 	 * download meik screen
 	 * @param response
 	 * @param jsonStr
@@ -1136,6 +1159,7 @@ public class ClientAPI {
 	}
 	
 	/**
+	 * 下載最新版本的MEIK程序
 	 * download meik report
 	 * @param response
 	 * @param jsonStr
@@ -1195,6 +1219,7 @@ public class ClientAPI {
 	}
 	
 	/**
+	 * 下載最新版本的MEIK程序
 	 * download meik tool
 	 * @param response
 	 * @param jsonStr

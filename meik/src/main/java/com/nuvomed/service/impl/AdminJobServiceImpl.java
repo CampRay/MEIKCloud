@@ -153,16 +153,43 @@ public class AdminJobServiceImpl implements AdminJobService {
 	 * @see com.bps.service.AdminJobService#deleteAdminJob(com.bps.dto.TadminJob) 
 	 */
 	public void deleteAdminJob(TadminJob adminJob) {
-		adminJobDao.delete(adminJob);
+		if(adminJob!=null){
+			int userId=adminJob.getUserId();
+			adminJobDao.delete(adminJob);			
+			userDao.delete(userId);		
+			userDataDao.deleteAll(userDataDao.findBy("userId", userId));		
+			userInfoDao.deleteAll(userInfoDao.findBy("userId", userId));
+		}		
 	}
 
 	public void deleteAdminJobById(Integer id) {
-		adminJobDao.delete(id);
-		
+		TadminJob job=adminJobDao.get(id);
+		if(job!=null){
+			int userId=job.getUserId();
+			adminJobDao.delete(job);
+			
+			userDao.delete(userId);
+			//List<TuserData> userDataList=userDataDao.findBy("userId", userId);
+			userDataDao.deleteAll(userDataDao.findBy("userId", userId));		
+			userInfoDao.deleteAll(userInfoDao.findBy("userId", userId));
+		}
 	}
 
-	public void deleteAdminJobByIds(Integer[] ids) {		
-		adminJobDao.deleteAll(ids);						
+	public void deleteAdminJobByIds(Integer[] ids) {
+		List<TadminJob> jobList=new ArrayList<TadminJob>();	
+		List<Integer> userIdList=new ArrayList<Integer>();
+		for (Integer id : ids) {
+			TadminJob job=adminJobDao.get(id);
+			jobList.add(job);			
+			userIdList.add(job.getUser().getUserId());
+		}
+		adminJobDao.deleteAll(jobList);		
+		for (int userId : userIdList) {			
+			userInfoDao.deleteAll(userInfoDao.findBy("user.userId",userId ));
+			userDataDao.deleteAll(userDataDao.findBy("userId", userId));
+			userDao.delete(userId);
+		}
+		
 	}
 	
 	/**
@@ -184,7 +211,7 @@ public class AdminJobServiceImpl implements AdminJobService {
 		return criteria.list();
 				
 	}
-	
+		
 	/**
 	 * 查询所有分配给系统医生的报表任务记录
 	 * @param doctorId 
@@ -197,8 +224,11 @@ public class AdminJobServiceImpl implements AdminJobService {
 		.add(Restrictions.eq("type", 5));				
 		return criteria.list();
 				
-	}
+	}	
 	
+	/**
+	 * 查詢所有分配給指定人員的报表任务记录
+	 */
 	@SuppressWarnings("unchecked")
 	public List<TadminJob> loadAdminJobList(String adminId,int type) {
 		Criteria criteria=adminJobDao.createCriteria();
@@ -744,7 +774,7 @@ public class AdminJobServiceImpl implements AdminJobService {
 			adminJob.setAdminUser(systemDoctor);
 			adminJob.setAssignTime(System.currentTimeMillis());
 		}
-		else{//如果用户组中没有系统医生帐号，则指定Screen数据给系统配置的系统医生
+		else{//如果用户组中没有管理員帐号，则指定Screen数据给系统配置的系统医生
 			String doctorId=SystemConfig.Admin_Setting_Map.get("System_Doctor_Id");
 			systemDoctor=adminUserDao.get(doctorId);
 			if(systemDoctor!=null){

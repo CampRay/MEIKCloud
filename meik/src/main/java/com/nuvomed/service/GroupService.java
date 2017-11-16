@@ -30,4 +30,5 @@ public interface GroupService {
 	
 	public void deactivateByIds(Integer[] ids);
 		
+		
 }

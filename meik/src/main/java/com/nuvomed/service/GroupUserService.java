@@ -32,5 +32,9 @@ public interface GroupUserService {
 	List<String> getAllSameGroupUsers(String adminId);
 	
 	List<TadminUser> getAllSameGroupUsers(TadminUser adminUser);
+	
+
+	public List<TadminUser> getGroupManagerIdsByUser(TadminUser adminUser);
+	public List<TadminUser> getGroupManagerIdsByUser(String adminUserID);
 		
 }

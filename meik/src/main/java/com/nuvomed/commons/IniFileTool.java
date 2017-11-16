@@ -60,6 +60,12 @@ public class IniFileTool {
     		e.printStackTrace();
     		throw new RuntimeException("IO Exception:" + e);
     	}
+    	finally {
+    		try{
+    			bufferedReader.close();
+    		}catch(Exception e){}
+		}
+    	
     }
     /**
      * 读取文件

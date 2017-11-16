@@ -28,6 +28,7 @@ public class Tuser implements java.io.Serializable {
 	private Boolean free;
 	private String location;
 	private Integer result;
+	private Boolean missingData;
 	
 	private String clientName;
 	
@@ -209,6 +210,15 @@ public class Tuser implements java.io.Serializable {
 		this.result = result;
 	}
 
+
+	public Boolean getMissingData() {
+		return missingData;
+	}
+
+
+	public void setMissingData(Boolean missingData) {
+		this.missingData = missingData;
+	}
 	
 
 }

@@ -103,7 +103,8 @@ public class JobsController extends BaseController{
 			TadminUser tDoctor=adminUserService.getAdminUserById(doctor);
 			for (String id : idstrArr) {
 				TadminJob job=adminJobService.getAdminJobById(Integer.parseInt(id));
-				job.setType(2);				
+				job.setType(2);	
+				job.setStatus(false);
 				job.setAdminUser(tDoctor);
 				job.setAssignTime(System.currentTimeMillis());
 				adminJobService.updateAdminJob(job);

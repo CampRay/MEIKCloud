@@ -196,6 +196,24 @@ public class GroupUserServiceImpl implements GroupUserService {
 		return adminUserList;
 		
 	}
+	
+	/**
+	 * 查找出所有和指定用户是一个组的所有报表管理者的帐户
+	 * @param adminUser
+	 * @return
+	 */
+	public List<TadminUser> getGroupManagerIdsByUser(TadminUser adminUser){
+		
+		return groupUserDao.getManagerIdsByUser(adminUser);
+	}
+	/**
+	 * 查找出所有和指定用户是一个组的所有报表管理者的帐户
+	 * @param adminUser
+	 * @return
+	 */
+	public List<TadminUser> getGroupManagerIdsByUser(String adminUserID){
+		return groupUserDao.getManagerIdsByUser(adminUserID);
+	}
 		
 
 }

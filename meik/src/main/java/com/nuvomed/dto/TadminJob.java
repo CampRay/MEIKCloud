@@ -82,6 +82,8 @@ public class TadminJob implements Serializable {
 	
 	private Integer screenResult;
 	
+	private boolean missingData=false;
+	
 	public TadminJob() {
 	}
 
@@ -437,7 +439,7 @@ public class TadminJob implements Serializable {
 
 	public boolean isFree() {
 		if(user!=null){
-			return user.getFree()==null?false:true;
+			return user.getFree()==null?false:user.getFree();
 		}
 		else{
 			return false;
@@ -460,6 +462,19 @@ public class TadminJob implements Serializable {
 
 	public void setScreenResult(Integer screenResult) {
 		this.screenResult = screenResult;
+	}
+
+
+	public boolean isMissingData() {
+		if(user!=null){
+			missingData=user.getMissingData()==null?false:user.getMissingData();
+		}			
+		return missingData;
+	}
+
+
+	public void setMissingData(boolean missingData) {
+		this.missingData = missingData;
 	}
 		
 	

@@ -1,12 +1,14 @@
 package com.nuvomed.core;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -66,26 +68,11 @@ import com.nuvomed.service.UserService;
  *
  */
 public class MultiThreadHandler implements Runnable {
-
 	
 	private UserService userService;
 	private UserDataService userDataService;	
 	private AdminJobService adminJobService;
-	
-//	public static void main(String[] args) 
-//	{
-//		Tuser user=new Tuser();
-//		user.setCode("17091711301");
-//		user.setFirstName("Phills");
-//		user.setLastName("Li");
-//		user.setBirthday("1975/06/02");
-//		user.setEmail("phills.li@cmpray.com");
-//		user.setLocation("中山三乡");
-//				
-//		MultiThreadHandler handler=new MultiThreadHandler(user);
-//		handler.run();
-//	}
-	
+		
 	
 	private Tuser user;
 	private String zipFilePath;
@@ -101,7 +88,10 @@ public class MultiThreadHandler implements Runnable {
 	private String techName;
 	private String height;
 	private String weight;
-
+	//已读取的左乳数据数
+	private int leftNum=0;
+	//已读取的右乳数据数
+	private int righttNum=0;
 	
 	public MultiThreadHandler(int userId) {
 		userService=(UserService)MyApplicationContextUtil.getBeanById("userService");
@@ -145,17 +135,24 @@ public class MultiThreadHandler implements Runnable {
 				ZipUtil.unzip(zipFile, unzipFolder);
 				
 				//计算分析结果
-				HashMap<String,Character> resultMap=ScreenResultAnalysis(unzipFilePath);
+				HashMap<String,Character> resultMap=ScreenResultAnalysis(unzipFilePath);					
 				int lRes=-1;
 				int rRes=-1;
-				if(resultMap.size()>=2){
-					try{
-						lRes=Integer.parseInt(String.valueOf(resultMap.get("L")));
-						rRes=Integer.parseInt(String.valueOf(resultMap.get("R")));
-					}
-					catch(Exception exe){}
-					user.setResult(lRes > rRes ? lRes : rRes);
+				try{
+					lRes=resultMap.get("L")==null?-1:Integer.parseInt(String.valueOf(resultMap.get("L")));
+					rRes=resultMap.get("R")==null?-1:Integer.parseInt(String.valueOf(resultMap.get("R")));
 				}
+				catch(Exception exe){}
+				user.setResult(lRes > rRes ? lRes : rRes);
+				
+				if(leftNum<2||righttNum<2){
+					user.setMissingData(true);
+				}
+				else{
+					user.setMissingData(false);
+				}
+				userService.updateUser(user);
+				
 				//如果有分析结果则生成报告
 				if(user.getResult()>=0){
 					buildPdfReport(lRes,rRes);
@@ -191,11 +188,32 @@ public class MultiThreadHandler implements Runnable {
 			}
 			
 			File zipFile=new File(zipFilePath);
-			if(zipFile!=null&&zipFile.exists()){							
+			if(zipFile.exists()){							
 				if (!zipFile.delete()) {
+					try {
+						System.gc();    //回收资源
+						Thread.sleep(10000);
+					} catch (InterruptedException e) {						
+						e.printStackTrace();
+					}
 		            System.gc();    //回收资源
 		            zipFile.canWrite();
 		            zipFile.delete();
+		        }
+			}
+			
+			File csvZipFile=new File(unzipFolderPath+File.separator+user.getCode()+".zip");
+			if(csvZipFile.exists()){
+				if (!csvZipFile.delete()) {
+					try {
+						System.gc();    //回收资源
+						Thread.sleep(10000);
+					} catch (InterruptedException e) {						
+						e.printStackTrace();
+					}
+		            System.gc();    //回收资源
+		            csvZipFile.canWrite();
+		            csvZipFile.delete();
 		        }
 			}
 		}
@@ -223,9 +241,10 @@ public class MultiThreadHandler implements Runnable {
 			int row=0;
 			if(folder.exists()){
 				if(folder.isDirectory()){				
-					 File[] fileList = folder.listFiles();	          
-			         for(File file:fileList)
-			         {
+					 File[] fileList = folder.listFiles();	 
+					 
+					 for (int index = fileList.length-1; index >=0; index--) {
+						 File file=fileList[index];
 			        	 //处理所有xml文件
 			        	 if(file.getName().endsWith(".xml")){
 			        		 String pos=getXmlResult(file,result);
@@ -233,16 +252,25 @@ public class MultiThreadHandler implements Runnable {
 			        			 String layerTitle="L".equalsIgnoreCase(pos)?"Left Breast:":"Right Breast:";			
 			        			 bufferedImage=imageTools.drawString(bufferedImage, layerTitle, java.awt.Color.WHITE, new java.awt.Font("Helvetica", java.awt.Font.PLAIN,14), 10, 174*row+50);
 			        			 for (int i = 1; i <= 7; i++) {
-		        					 String imgLayer=file.getAbsolutePath().replace(".xml", "_"+pos.toUpperCase()+i+".jpg");
+		        					 String imgLayer=file.getAbsolutePath().replace(".xml", "_L"+i+".jpg");
 		        					 File imgFile=new File(imgLayer);
 		        					 if(imgFile.exists()){	        						 
-		        						 bufferedImage=imageTools.drawImage(bufferedImage, imageTools.loadImageLocal(imgFile), 154*(i-1)+10, 174*row+60);
+		        						 bufferedImage=imageTools.drawImage(bufferedImage, imageTools.loadImageLocal(imgFile), 154*(i-1)+10, 174*row+60);		        						 
 		        					 }
 								}		        			 		        			 
 			        			row++;
 			        		 }
 			        	 }			        	 
 			         }
+					 //刪除所有L1-L7的圖片
+					 try{
+						 for (File file : fileList) {
+							 if(file.getName().endsWith(".jpg")){
+								 file.delete();
+							 }
+						}
+					 }
+					 catch(Exception ex){}
 				}
 			}
 			imageTools.SaveImage(bufferedImage,archiveFolderPath+ File.separator+user.getCode()+".jpg");
@@ -266,10 +294,24 @@ public class MultiThreadHandler implements Runnable {
 			SAXReader reader = new SAXReader();
 	   		org.dom4j.Document fileDocument = reader.read(file);//读取xml文件
 	   		Element root = fileDocument.getRootElement();//获取根元素  
-	   		breast=root.element("Breast").getText();
+	   		breast=root.elementText("Breast");
+	   		//如果左右乳已读2份数据，则不用再读取
+	   		if("L".equalsIgnoreCase(breast)){
+	   			if(leftNum>=2){
+	   				return null;
+	   			}
+	   			leftNum++;
+	   		}
+	   		else if("R".equalsIgnoreCase(breast)){
+	   			if(righttNum>=2){
+	   				return null;
+	   			}
+	   			righttNum++;
+	   		}
+	   		
 	   		//String layer1=root.element("Layer1").getText();
-	   		String layer2=root.element("Layer2").getText();
-	   		String layer3=root.element("Layer3").getText();
+	   		String layer2=root.elementText("Layer2");
+	   		String layer3=root.elementText("Layer3");
 	   		//String layer4=root.element("Layer4").getText();	   	
 	   		Character oldVal=(Character)result.get(breast);	   		
 	   		int index=0;
@@ -334,6 +376,7 @@ public class MultiThreadHandler implements Runnable {
 			if(oldVal==null){
 				result.put(breast, '0');
 			}
+			
 		}
 		catch(Exception e){
 			e.printStackTrace();
@@ -491,8 +534,7 @@ public class MultiThreadHandler implements Runnable {
 				
 				else{					
 					userDataService.updateUserData(userDataPDF);
-				}				
-				userService.updateUser(user);
+				}								
 				
 			} catch (Exception e) {			
 				e.printStackTrace();
@@ -506,16 +548,16 @@ public class MultiThreadHandler implements Runnable {
 				}
 			}
 						
-			//如果自动分析结果为正常情况，则设置任务状态为结束
-			TadminJob adminJob=adminJobService.getAdminJobByCode(user.getCode());
-			//判断是否已经上传过数据
-			if(adminJob!=null){
-				if(user.getResult()<2){
-					adminJob.setStatus(true);
-					adminJob.setCloseTime(System.currentTimeMillis());
-					adminJobService.updateAdminJob(adminJob);
-				}
-			}
+//			//如果自动分析结果为正常情况，则设置任务状态为结束
+//			TadminJob adminJob=adminJobService.getAdminJobByCode(user.getCode());
+//			//判断是否已经上传过数据
+//			if(adminJob!=null){
+//				if(user.getResult()<2){
+//					adminJob.setStatus(true);
+//					adminJob.setCloseTime(System.currentTimeMillis());
+//					adminJobService.updateAdminJob(adminJob);
+//				}
+//			}
 			
 		}
 		catch(Exception e){
@@ -528,13 +570,11 @@ public class MultiThreadHandler implements Runnable {
 	 * 生成csv文件	 
 	 */
 	private void buildCsvFile(int leftVal,int rightVal){
-//		File csvFile = new File(unzipFilePath+File.separator+user.getCode()+".csv");
-//        BufferedWriter csvFileOutputStream = null;
+		File csvFile = new File(unzipFilePath+File.separator+user.getCode()+".csv");
+        BufferedWriter csvFileOutputStream = null;
         try {                                    
             // UTF-8使正确读取分隔符","            			            
-//            csvFileOutputStream = new BufferedWriter(
-//                    new OutputStreamWriter(
-//                            new FileOutputStream(csvFile), "UTF-8"),1024);
+            csvFileOutputStream = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(csvFile), "UTF-8"),1024);
             StringBuilder headerStr = new StringBuilder();
 			headerStr.append("Client Number,");
 			headerStr.append("Name,");
@@ -549,8 +589,8 @@ public class MultiThreadHandler implements Runnable {
 			headerStr.append("Technician Name,");
 			headerStr.append("Left Breast Result,");
 			headerStr.append("Right Breast Result");
-//            csvFileOutputStream.write(headerStr.toString());            
-//            csvFileOutputStream.newLine();
+            csvFileOutputStream.write(headerStr.toString());            
+            csvFileOutputStream.newLine();
             
             StringBuilder data = new StringBuilder();
             data.append("\"" + user.getCid() + "\",");
@@ -569,13 +609,13 @@ public class MultiThreadHandler implements Runnable {
             switch (leftVal)
             {
                 case 0:
-                    data.append("Normal,");
+                    data.append("正常 Normal,");
                     break;
                 case 1:
-                    data.append("Benign changes detected,");
+                    data.append("發現良性病理性改變 Benign changes detected,");
                     break;
                 case 2:
-                    data.append("Suspicious changes detected,");
+                    data.append("發現可疑病理性改變 Suspicious changes detected,");
                     break;
                 default:
                     data.append("N/A,");
@@ -585,36 +625,43 @@ public class MultiThreadHandler implements Runnable {
             switch (rightVal)
             {
                 case 0:
-                    data.append("Normal");
+                    data.append("正常 Normal");
                     break;
                 case 1:
-                    data.append("Benign changes detected");
+                    data.append("發現良性病理性改變 Benign changes detected");
                     break;
                 case 2:
-                    data.append("Suspicious changes detected");
+                    data.append("發現可疑病理性改變 Suspicious changes detected");
                     break;
                 default:
                     data.append("N/A");
                     break;
             }
             
-//            csvFileOutputStream.write(data.toString());            
-//            csvFileOutputStream.newLine();
-//            csvFileOutputStream.flush();
+            csvFileOutputStream.write(data.toString());            
+            csvFileOutputStream.newLine();
+            csvFileOutputStream.flush();
+            csvFileOutputStream.close();
+//            headerStr.append("\r\n");
+//            headerStr.append(data);
             
-            headerStr.append("\r\n");
-            headerStr.append(data);
+            ZipUtil.zip(unzipFilePath, unzipFolderPath, user.getCode()+".zip", ".jpg|.csv");
             
-          //上傳傳速報告到數據庫									
-			try {										
+          //上傳傳速報告到數據庫	
+            InputStream inputStream=null;
+			try {
+				inputStream =new FileInputStream(new File(unzipFolderPath+File.separator+user.getCode()+".zip"));				
+				byte [] fileBytes=ConvertTools.toByteArray(inputStream);		
+				
 				TuserData userDataCSV=userDataService.loadCsvFile(user.getUserId());
 				boolean noRecord=(userDataCSV==null);
 				if(noRecord){
 					userDataCSV=new TuserData();								
 					
 				}
-				userDataCSV.setFileName(user.getCode()+".csv");
-				userDataCSV.setStream(headerStr.toString().getBytes());	
+				userDataCSV.setFileName(user.getCode()+".zip");
+				//userDataCSV.setStream(headerStr.toString().getBytes());	
+				userDataCSV.setStream(fileBytes);
 				userDataCSV.setUserId(user.getUserId());
 				userDataCSV.setDataType(6);
 				if(noRecord){

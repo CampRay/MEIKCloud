@@ -48,5 +48,8 @@
         <property name="result" type="java.lang.Integer">
             <column name="screen_result" />
         </property>
+        <property name="missingData" type="java.lang.Boolean">
+            <column name="missing_data" />
+        </property>
     </class>
 </hibernate-mapping>
