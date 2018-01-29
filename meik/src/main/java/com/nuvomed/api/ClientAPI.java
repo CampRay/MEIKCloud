@@ -634,7 +634,7 @@ public class ClientAPI {
 					else{//如果用户组中没有管理員帐号，则指定Screen数据给系统配置的系统医生						
 						systemDoctor=adminUserService.getAdminUserById(doctorId);						
 					}
-					
+					adminJob.setAdminUser(systemDoctor);					
 					//发送通知电邮
 					//TadminUser systemDoctor=adminUserService.getAdminUserById(doctorId);
 					if(systemDoctor.getAdminInfo()==null||systemDoctor.getAdminInfo().getNotify()){					
