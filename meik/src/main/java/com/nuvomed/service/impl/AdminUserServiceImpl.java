@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.nuvomed.dao.AdminUserDao;
+import com.nuvomed.dao.GroupUserDao;
 import com.nuvomed.dto.TadminUser;
 import com.nuvomed.model.DataTableParamter;
 import com.nuvomed.model.PagingData;
@@ -38,7 +39,8 @@ public class AdminUserServiceImpl implements AdminUserService {
 	
 	@Autowired
 	private AdminUserDao adminUserDao;
-				
+	@Autowired
+	private GroupUserDao groupUserDao;			
 
 	/**
 	 * (non-Javadoc)
@@ -114,17 +116,33 @@ public class AdminUserServiceImpl implements AdminUserService {
 	 * @param adminUser 
 	 * @see com.bps.service.AdminUserService#deleteAdminUser(com.bps.dto.TadminUser) 
 	 */
+	@SuppressWarnings("unchecked")
 	public void deleteAdminUser(TadminUser adminUser) {
 		adminUserDao.delete(adminUser);
+		//删除组成员记录
+		Criteria criteria=groupUserDao.createCriteria();		
+		criteria=criteria.add(Restrictions.eq("adminUser", adminUser));					
+		groupUserDao.deleteAll(criteria.list());
 	}
 
+	@SuppressWarnings("unchecked")
 	public void deleteAdminUserById(int id) {
 		adminUserDao.delete(id);
-		
+		//删除组成员记录
+		Criteria criteria=groupUserDao.createCriteria();		
+		criteria=criteria.add(Restrictions.eq("adminUser.adminId", id));					
+		groupUserDao.deleteAll(criteria.list());
 	}
 
+	@SuppressWarnings("unchecked")
 	public void deleteAdminUserByIds(String[] ids) {
-		adminUserDao.deleteAll(ids);				
+		adminUserDao.deleteAll(ids);
+		//删除组成员记录
+		for (String id : ids) {
+			Criteria criteria=groupUserDao.createCriteria();		
+			criteria=criteria.add(Restrictions.eq("adminUser.adminId", id));						
+			groupUserDao.deleteAll(criteria.list());
+		}				
 	}
 
 	public PagingData loadAdminUserList(DataTableParamter rdtp) {
@@ -196,7 +214,14 @@ public class AdminUserServiceImpl implements AdminUserService {
 	@SuppressWarnings("unchecked")
 	public List<TadminUser> loadAllAdminUserList() {
 		Criteria criteria=adminUserDao.createCriteria();
-		criteria.add(Restrictions.le("adminRole.roleId", new Integer(4)));
+		criteria.add(Restrictions.or(Restrictions.eq("adminRole.roleId", new Integer(2)),Restrictions.eq("adminRole.roleId", new Integer(3)),Restrictions.eq("adminRole.roleId", new Integer(4))));
+		return criteria.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<TadminUser> loadAllDoctorList() {
+		Criteria criteria=adminUserDao.createCriteria();
+		criteria.add(Restrictions.or(Restrictions.eq("adminRole.roleId", new Integer(3)),Restrictions.eq("adminRole.roleId", new Integer(4))));
 		return criteria.list();
 	}
 

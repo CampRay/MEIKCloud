@@ -54,10 +54,20 @@ public class GroupUserServiceImpl implements GroupUserService {
 		criteria=criteria.add(Restrictions.eq("adminUser.adminId", adminId));
 		return (TgroupUser)criteria.uniqueResult();
 	}
+	
+	/**
+	 * 根据用户ID查询组成员记录
+	 */
+	@SuppressWarnings("unchecked")
+	public List<TgroupUser> getGroupUser(String adminId) {
+		Criteria criteria=groupUserDao.createCriteria();		
+		criteria=criteria.add(Restrictions.eq("adminUser.adminId", adminId));
+		return criteria.list();
+	}
 
 	
 	public List<TgroupUser> getAllGroupUsers() {
-		return groupUserDao.findBy("deleted", false);
+		return groupUserDao.LoadAll();
 	}
 
 	
@@ -84,7 +94,7 @@ public class GroupUserServiceImpl implements GroupUserService {
 	public void deleteGroupUsersByIds(Integer[] ids) {
 		groupUserDao.deleteAll(ids);
 	}
-
+		
 	
 	public PagingData loadGroupUsersList(DataTableParamter rdtp) {
 		SimpleDateFormat simpleDateFormat =new SimpleDateFormat("MM/dd/yyyy");
@@ -214,6 +224,14 @@ public class GroupUserServiceImpl implements GroupUserService {
 	public List<TadminUser> getGroupManagerIdsByUser(String adminUserID){
 		return groupUserDao.getManagerIdsByUser(adminUserID);
 	}
-		
+	
+	/**
+	 * 查找出所有和指定用户是一个组的报表管理者或医生的帐户
+	 * @param adminUser
+	 * @return
+	 */
+	public List<TadminUser> getGroupDoctorsByUser(String adminUserID){
+		return groupUserDao.getDoctorsByUser(adminUserID);
+	}
 
 }

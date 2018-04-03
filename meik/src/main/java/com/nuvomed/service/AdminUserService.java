@@ -41,5 +41,7 @@ public interface AdminUserService {
 	public List<TadminUser> loadDoctorList();
 	
 	public List<TadminUser> loadAllAdminUserList();
+	
+	public List<TadminUser> loadAllDoctorList();
 		
 }

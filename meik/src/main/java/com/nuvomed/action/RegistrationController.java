@@ -38,10 +38,7 @@ import com.nuvomed.model.DataTableParamter;
 import com.nuvomed.model.PagingData;
 import com.nuvomed.service.AdminInfoService;
 import com.nuvomed.service.AdminJobService;
-import com.nuvomed.service.AdminRoleService;
-import com.nuvomed.service.AdminUserService;
 import com.nuvomed.service.UserInfoService;
-import com.nuvomed.service.UserService;
 
 /** 
  * @ClassName: RegistrationController 
@@ -53,13 +50,7 @@ import com.nuvomed.service.UserService;
 @Controller
 public class RegistrationController extends BaseController {	
 	@Autowired
-	private AdminRoleService adminRoleService;
-	@Autowired
-	private AdminUserService adminUserService;	
-	@Autowired
 	private UserInfoService userInfoService;
-	@Autowired
-	private UserService userService;
 	@Autowired
 	private AdminJobService adminJobService;
 	@Autowired

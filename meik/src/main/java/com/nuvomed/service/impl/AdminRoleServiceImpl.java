@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,8 +58,28 @@ public class AdminRoleServiceImpl implements AdminRoleService {
 	 * @return 
 	 * @see com.bps.service.AdminRoleService#getAllAdminRoles()
 	 */
+	@SuppressWarnings("unchecked")
 	public List<TadminRole> getAllAdminRoles(){
-		return adminRoleDao.findBy("status", true);
+		Criteria criteria=adminRoleDao.createCriteria();
+		criteria.add(Restrictions.ne("roleId", new Integer(1)));
+		criteria.add(Restrictions.ne("roleId", new Integer(5)));
+		criteria.add(Restrictions.eq("status", true));
+		return criteria.list();	
+	}
+	
+	/**
+	 * 加载报告工作流程相关角色
+	 * <p>Title: getAllAdminRoles</p> 
+	 * <p>Description: </p> 
+	 * @return 
+	 * @see com.bps.service.AdminRoleService#getAllWorkRoles()
+	 */
+	@SuppressWarnings("unchecked")
+	public List<TadminRole> getAllWorkRoles(){
+		Criteria criteria=adminRoleDao.createCriteria();
+		criteria.add(Restrictions.or(Restrictions.eq("roleId", new Integer(2)),Restrictions.eq("roleId", new Integer(3))));
+		criteria.add(Restrictions.eq("status", true));
+		return criteria.list();		
 	}
 
 	/**

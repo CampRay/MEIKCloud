@@ -55,11 +55,11 @@
 					<ul class="dropdown-menu">
 						<li>
 							<a href="<c:url value="/"/>userprofile">
-							<i class="icon-user"></i> My Profile </a>
+							<i class="icon-user"></i> <s:message code="all.button.profile"/> </a>
 						</li>
 						<li>
 							<a href="<c:url value="/"/>logout">
-							<i class="icon-key"></i> Log Out </a>
+							<i class="icon-key"></i> <s:message code="all.button.logout"/> </a>
 						</li>
 					</ul>
 				</li>

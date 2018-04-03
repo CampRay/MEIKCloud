@@ -10,7 +10,6 @@ package com.nuvomed.action;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,8 +28,7 @@ import com.nuvomed.dto.TadminUser;
 @Controller
 @RequestMapping("/common")
 public class CommonController extends BaseController {	
-	private Logger logger = Logger.getLogger(CommonController.class);
-	
+		
 	@RequestMapping(value="header",method=RequestMethod.GET)
 	public ModelAndView header(HttpServletRequest request){
 		ModelAndView mav=new ModelAndView();

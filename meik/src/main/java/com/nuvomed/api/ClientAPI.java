@@ -17,7 +17,6 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Controller;
@@ -35,7 +34,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.nuvomed.commons.ConvertTools;
 import com.nuvomed.commons.EMailTool;
 import com.nuvomed.commons.SecurityTools;
-import com.nuvomed.commons.StringTool;
 import com.nuvomed.commons.SystemConfig;
 import com.nuvomed.core.MultiThreadHandler;
 import com.nuvomed.dto.TadminJob;
@@ -47,25 +45,18 @@ import com.nuvomed.dto.Tuser;
 import com.nuvomed.dto.TuserData;
 import com.nuvomed.dto.TuserInfo;
 import com.nuvomed.service.AdminJobService;
-import com.nuvomed.service.AdminRoleService;
 import com.nuvomed.service.AdminUserService;
 import com.nuvomed.service.GroupUserService;
-import com.nuvomed.service.LanguageService;
 import com.nuvomed.service.LicenseService;
 import com.nuvomed.service.RecordsService;
 import com.nuvomed.service.UserDataService;
 import com.nuvomed.service.UserInfoService;
 import com.nuvomed.service.UserService;
-import com.nuvomed.service.VersionService;
 
 
 @Controller
 @RequestMapping("/api")
 public class ClientAPI {
-	 private Logger logger = Logger.getLogger(ClientAPI.class);	
-	
-	@Autowired
-	private LanguageService languageService;
 	@Autowired
 	private AdminUserService adminUserService;
 	@Autowired
@@ -79,11 +70,8 @@ public class ClientAPI {
 	@Autowired
 	private LicenseService licenseService;
 	@Autowired
-	private VersionService versionService;
-	@Autowired
 	private RecordsService recordsService;
-	@Autowired
-	private AdminRoleService adminRoleService;
+
 	@Autowired
 	private GroupUserService groupUserService;
 	@Autowired
@@ -92,7 +80,7 @@ public class ClientAPI {
 	
 	
 	/**
-	 * 激活lisense
+	 * 激活MEIK Screen程序的lisense
 	 * @param response
 	 * @param jsonStr
 	 * @return String
@@ -156,7 +144,7 @@ public class ClientAPI {
 	}
 	
 	/**
-	 * 检测lisense有效性
+	 * 检测MEIK Screen程序lisense的有效性
 	 * @param response
 	 * @param jsonStr
 	 * @return String
@@ -203,6 +191,133 @@ public class ClientAPI {
 				
 		return JSON.toJSONString(respJson);
 	}
+	/**
+	 * 激活MEIK Report程序的lisense
+	 * @param response
+	 * @param jsonStr
+	 * @return String
+	 */
+	@RequestMapping(value="/activeReport",method=RequestMethod.POST)
+	@ResponseBody
+	public String activeReport(@RequestBody String jsonStr){					
+		JSONObject respJson = new JSONObject();	
+		if (jsonStr == null || jsonStr.isEmpty()) {
+			respJson.put("status", 0);
+			respJson.put("info", "API_MSG_1");
+			return JSON.toJSONString(respJson);
+		}
+		
+		JSONObject jsonObj = (JSONObject) JSON.parse(jsonStr);
+		if(jsonObj!=null){
+			String license = jsonObj.getString("license");
+			String cpuid = jsonObj.getString("cpuid");	
+			String deviceId = jsonObj.getString("deviceId");				
+			if (license==null||license.isEmpty()) {
+				respJson.put("status", 0);
+				//respJson.put("info", "The license is required.");
+				respJson.put("info", "API_MSG_1");
+				return JSON.toJSONString(respJson);
+			}
+			
+			try{
+				Tlicense tLicense=licenseService.getLicenseById(license);
+				if(tLicense==null){
+					respJson.put("status", 0);
+					//respJson.put("info", "The license is invalid.");
+					respJson.put("info", "API_MSG_2");
+				}
+				else if(tLicense.getType()!=1){
+					respJson.put("status", 0);
+					//respJson.put("info", "The license is disabled.");
+					respJson.put("info", "API_MSG_2");
+				}
+				else if(!tLicense.isStatus()){
+					respJson.put("status", 0);
+					//respJson.put("info", "The license is disabled.");
+					respJson.put("info", "API_MSG_3");
+				}
+				else if(tLicense.getDeadline()!=null&&tLicense.getDeadline()<=System.currentTimeMillis()){
+					respJson.put("status", 0);
+					//respJson.put("info", "The license have expired.");
+					respJson.put("info", "API_MSG_4");
+				}
+				else{
+					tLicense.setCpuId(cpuid);
+					tLicense.setDeviceId(deviceId);
+					tLicense.setActiveTime(System.currentTimeMillis());
+					licenseService.updateLicense(tLicense);
+					respJson.put("status", 1);
+				}
+			}
+			catch(Exception e){
+				respJson.put("status", 0);
+				//respJson.put("info", "Activation server failure, failed to activate the license, please try again later.");
+				respJson.put("info", "API_MSG_5");
+			}
+		}
+		else{
+			respJson.put("status", 0);
+			//respJson.put("info", "The license is required.");
+			respJson.put("info", "API_MSG_1");
+			return JSON.toJSONString(respJson);
+		}
+			
+		
+		return JSON.toJSONString(respJson);
+	}
+	
+	/**
+	 * 检测MEIK Report程序lisense的有效性
+	 * @param response
+	 * @param jsonStr
+	 * @return String
+	 */
+	@RequestMapping(value="/checkReport",method=RequestMethod.POST)
+	@ResponseBody
+	public String checkReport(@RequestBody String jsonStr){					
+		JSONObject respJson = new JSONObject();	
+		if (jsonStr == null || jsonStr.isEmpty()) {
+			respJson.put("status", 0);
+			respJson.put("info", "API_MSG_1");
+			return JSON.toJSONString(respJson);
+		}
+		
+		JSONObject jsonObj = (JSONObject) JSON.parse(jsonStr);
+		String license = jsonObj.getString("license");
+		String cpuid = jsonObj.getString("cpuid");			
+		if (license==null||license.isEmpty()) {
+			respJson.put("status", 0);	
+			respJson.put("info", "API_MSG_1");
+			return JSON.toJSONString(respJson);
+		}
+			
+		Tlicense tLicense=licenseService.getLicenseById(license);
+		if(tLicense==null){
+			respJson.put("status", 0);
+			respJson.put("info", "API_MSG_2");
+		}
+		else if(tLicense.getType()!=1){
+			respJson.put("status", 0);
+			respJson.put("info", "API_MSG_2");
+		}
+		else if(!tLicense.isStatus()){
+			respJson.put("status", 0);
+			respJson.put("info", "API_MSG_3");
+		}
+		else if(tLicense.getDeadline()!=null&&tLicense.getDeadline()<=System.currentTimeMillis()){
+			respJson.put("status", 0);
+			respJson.put("info", "API_MSG_4");
+		}
+		else if(tLicense.getCpuId().equalsIgnoreCase(cpuid)){
+			respJson.put("status", 1);
+		}
+		else{
+			respJson.put("status", 0);
+			respJson.put("info", "API_MSG_5");
+		}
+				
+		return JSON.toJSONString(respJson);
+	}
 		
 	
 	/**
@@ -224,8 +339,7 @@ public class ClientAPI {
 		
 		jsonObj = (JSONObject) JSON.parse(jsonStr);
 		String username = jsonObj.getString("username");
-		String password = jsonObj.getString("password");
-		String language = jsonObj.getString("language");
+		String password = jsonObj.getString("password");		
 		if (username==null||username.isEmpty()) {
 			respJson.put("status", 0);
 			respJson.put("info", "The username is required.");

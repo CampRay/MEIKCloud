@@ -12,10 +12,8 @@ var LicensesTable = function () {
         	"filter":true,
         	"sort":false,
         	"info":true,
-        	"processing":true,
-        	"scrollX":"100%",
-           	"scrollXInner":"100%",
-            "displayLength": 10,
+        	"processing":true,        	
+            "displayLength": 15,
             "dom": "t<'row'<'col-md-6'i><'col-md-6'p>>",
             "oLanguage": {
                 "sProcessing": loadProperties("dataTable.page.process",local,rootURI),                
@@ -34,22 +32,30 @@ var LicensesTable = function () {
             "columns": [
                {"orderable": false },
 	           {data: "license"  },
+	           {'render':function(data,status,row){                   
+	   			   var str = 'MEIK Screen';
+	   			   if(row.type=="1"){
+	   					str ="MEIK Report";
+	   			   }
+	   			   return str;
+	   			}
+	           },	  
 	           {data: "deviceId",defaultContent:""},
 	           {data: "deadlineStr",defaultContent:""},
 	           {data: "cpuId",defaultContent:"" },
 	           {data: "createdTimeStr",defaultContent:"" },
 	           {data: "activeTimeStr",defaultContent:"" },	           
 	           {'render':function(data,status,row){
-	                                var tem = row.status;
-			        				var str = '';
-			        				if(tem==1){
-			        					str = loadProperties("dataTable.page.enable",local,rootURI);
-			        				}else if(tem==0){
-			        					str = loadProperties("dataTable.page.disable",local,rootURI);
-			        				}
-			        				return str;
-			        			}
-			           },	           
+                    var tem = row.status;
+    				var str = '';
+    				if(tem==1){
+    					str = loadProperties("dataTable.page.enable",local,rootURI);
+    				}else if(tem==0){
+    					str = loadProperties("dataTable.page.disable",local,rootURI);
+    				}
+    				return str;
+    			}
+	           },	           
 	          
 	        ],
 	        "serverSide": true,

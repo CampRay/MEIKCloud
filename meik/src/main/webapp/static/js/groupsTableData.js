@@ -1,25 +1,5 @@
-//jquery插件把表单序列化成json格式的数据start 
-(function($){
-    $.fn.serializeJson=function(){
-        var serializeObj={};
-        var array=this.serializeArray();
-        var str=this.serialize();
-        $(array).each(function(){
-            if(serializeObj[this.name]){
-                if($.isArray(serializeObj[this.name])){
-                    serializeObj[this.name].push(this.value);
-                }else{
-                    serializeObj[this.name]=[serializeObj[this.name],this.value];
-                }
-            }else{
-                serializeObj[this.name]=this.value;
-            }
-        });
-        return serializeObj;
-    };
-})(jQuery);
-
 var rootURI="/";
+var local="en_US";
 var GroupsTable = function () {
 	var oTable;
 	var oGroupUserTable;
@@ -37,11 +17,16 @@ var GroupsTable = function () {
 		    	"bRetrieve": true,
 		    	"processing":true,
 		    	"bDestroy":true,
-		    	"scrollX":"100%",
-	           	"scrollXInner":"100%",
 		        // set the initial value
 		        "displayLength": 5,
 		        "dom": "t<'row'<'col-md-6'i><'col-md-6'p>>",
+		        "oLanguage": {
+	                "sProcessing": loadProperties("dataTable.page.process",local,rootURI),                
+	                "sZeroRecords":loadProperties("dataTable.page.data.zero",local,rootURI),
+	                "sEmptyTable": loadProperties("dataTable.page.data.empty",local,rootURI),
+	                "sInfo": loadProperties("dataTable.page.info",local,rootURI),
+	                "sInfoEmpty":loadProperties("dataTable.page.info.empty",local,rootURI),
+	            },
 		        "columnDefs": [{                    
 	                    'targets': 0,   
 	                    'render':function(data,type,row){
@@ -62,7 +47,7 @@ var GroupsTable = function () {
 			//打开删除对话框前判断是否已选择要删除的行
 			$("#openDeleteGroupUsersModal").on("click",function(event){
 				if(userSelected.length==0){
-					handleAlerts("Please select the rows which you want to delete.","warning","");				
+					handleAlerts(loadProperties("error.delete.select",local,rootURI),"warning","");				
 					return false;
 				}
 			});
@@ -79,10 +64,10 @@ var GroupsTable = function () {
 							 userSelected=[];						 
 							 oGroupUserTable.api().draw();
 							 oGroupUserTable.$('th span').removeClass();
-			            	 handleAlerts("delete the group member successfully.","success","");
+			            	 handleAlerts(loadProperties("msg.groupuser.delete.success",local,rootURI),"success","");
 						 }
 						 else{
-							 handleAlerts("Failed to delete the group member. " +data.info,"danger","");
+							 handleAlerts(loadProperties("msg.groupuser.delete.failed",local,rootURI) +data.info,"danger","");
 						 }
 					}             	 
 	             },
@@ -142,11 +127,16 @@ var GroupsTable = function () {
         	"filter":true,
         	"sort":false,
         	"info":true,
-        	"processing":true,
-        	"scrollX":"100%",
-           	"scrollXInner":"100%",
+        	"processing":true,        	
             "displayLength": 10,
             "dom": "t<'row'<'col-md-6'i><'col-md-6'p>>",
+            "oLanguage": {
+                "sProcessing": loadProperties("dataTable.page.process",local,rootURI),                
+                "sZeroRecords":loadProperties("dataTable.page.data.zero",local,rootURI),
+                "sEmptyTable": loadProperties("dataTable.page.data.empty",local,rootURI),
+                "sInfo": loadProperties("dataTable.page.info",local,rootURI),
+                "sInfoEmpty":loadProperties("dataTable.page.info.empty",local,rootURI),
+            },
             "columnDefs": [{                    
                     'targets': 0,   
                     'render':function(data,type,row){
@@ -157,7 +147,7 @@ var GroupsTable = function () {
                 	'targets':-1,
                 	'data':null,//定义列名
                 	'render':function(data,type,row){                    	
-                		return '<div class="actions"><a  class="btn btn-sm dark" data-toggle="modal"  href="#view_group" id="openGroupViewModal">Group Member</a></div>';
+                		return '<div class="actions"><a  class="btn btn-sm dark" data-toggle="modal"  href="#view_group" id="openGroupViewModal">'+loadProperties("dataTable.page.group.member",local,rootURI)+'</a></div>';
                     },
                     'class':'center'
                 }
@@ -170,9 +160,9 @@ var GroupsTable = function () {
 	        				var tem = row.deleted;
 	        				var str = '';
 	        				if(tem){
-	        					str = 'Disable';
+	        					str = loadProperties("dataTable.page.disable",local,rootURI);
 	        				}else{
-	        					str = 'Enable';
+	        					str = loadProperties("dataTable.page.enable",local,rootURI);
 	        				}
 	        				return str;
 	        			}
@@ -191,20 +181,20 @@ var GroupsTable = function () {
 		//打开删除对话框前判断是否已选择要删除的行
 		$("#openDeleteGroupsModal").on("click",function(event){
 			if(selected.length==0){
-				handleAlerts("Please select the rows which you want to delete.","warning","");				
+				handleAlerts(loadProperties("error.delete.select",local,rootURI),"warning","");				
 				return false;
 			}
 		});		
 		
 		$("#openActiveGroupsModal").on("click",function(event){
 			if(selected.length==0){
-				handleAlerts("Please select the rows which you want to Active.","warning","");				
+				handleAlerts(loadProperties("error.active.select",local,rootURI),"warning","");				
 				return false;
 			}
 		});
 		$("#openDeactiveGroupsModal").on("click",function(event){
 			if(selected.length==0){
-				handleAlerts("Please select the rows which you want to deactive.","warning","");				
+				handleAlerts(loadProperties("error.deactive.select",local,rootURI),"warning","");				
 				return false;
 			}
 		});
@@ -220,10 +210,10 @@ var GroupsTable = function () {
 						 selected=[];						 
 		            	 oTable.api().draw();
 		            	 oTable.$('th span').removeClass();
-		            	 handleAlerts("delete the groups successfully.","success","");
+		            	 handleAlerts(loadProperties("msg.group.delete.success",local,rootURI),"success","");
 					 }
 					 else{
-						 handleAlerts("Failed to delete the groups. " +data.info,"danger","");
+						 handleAlerts(loadProperties("msg.group.delete.failed",local,rootURI) +data.info,"danger","");
 					 }
 				}             	 
              },
@@ -245,7 +235,7 @@ var GroupsTable = function () {
 						 selected=[];						 
 		            	oTable.api().draw();
 		            	oTable.$('th span').removeClass();
-		            	 handleAlerts("Activate the groups successfully.","success","");
+		            	 handleAlerts(loadProperties("msg.group.active.success",local,rootURI),"success","");
 					 }
 					 else{
 						 alert(data.info);
@@ -269,7 +259,7 @@ var GroupsTable = function () {
 						 selected=[];						 
 		            	 oTable.api().draw();
 		            	 oTable.$('th span').removeClass();
-		            	 handleAlerts("These groups are disabled successfully.","success","");
+		            	 handleAlerts(loadProperties("msg.group.deactive.success",local,rootURI),"success","");
 					 }
 					 else{
 						 alert(data.info);
@@ -291,11 +281,11 @@ var GroupsTable = function () {
 		});	
 		$("#openEditGroupModal").on("click",function(event){
 			if(selected.length>1){
-				handleAlerts("Only one row can be edited.","warning","");
+				handleAlerts(loadProperties("error.edit.select",local,rootURI),"warning","");
 				event.stopPropagation();
 			}else if(selected.length==0)
 			{
-				handleAlerts("Please choose one row.","warning","");
+				handleAlerts(loadProperties("error.row.select",local,rootURI),"warning","");
 				event.stopPropagation();
 			}
 			else{
@@ -409,10 +399,10 @@ var GroupsTable = function () {
         	 if(status == "success"){  
         		 if(resp.status){						 
 	            	 oTable.api().draw();
-	            	 handleAlerts("Added the data successfully.","success","");		            	 
+	            	 handleAlerts(loadProperties("msg.group.add.success",local,rootURI),"success","");		            	 
 				 }
 				 else{
-					 handleAlerts("Failed to add the data."+resp.info+"the name or email exist","danger","");						 
+					 handleAlerts(loadProperties("msg.group.add.failed",local,rootURI)+resp.info,"danger","");						 
 				 }
 			}             	 
          },
@@ -478,10 +468,10 @@ var GroupsTable = function () {
         		 if(resp.status){
 					 selected=[];
 	            	 oTable.api().draw();
-	            	 handleAlerts("Edited the data successfully.","success","");
+	            	 handleAlerts(loadProperties("msg.group.edit.success",local,rootURI),"success","");
 				 }
 				 else{
-					 handleAlerts("Failed to add the data."+resp.info+"the email is exist","danger","");
+					 handleAlerts(loadProperties("msg.group.edit.failed",local,rootURI)+resp.info,"danger","");
 				 }
 			}             	 
          },
@@ -550,10 +540,10 @@ var GroupsTable = function () {
         			 $('#add_groupUser').modal('hide');
         			 userSelected=[];
         			 oGroupUserTable.api().draw();
-	            	 handleAlerts("Added the data successfully.","success","");		            	 
+	            	 handleAlerts(loadProperties("msg.groupuser.add.success",local,rootURI),"success","");		            	 
 				 }
 				 else{
-					 handleAlerts("Failed to add the data."+resp.info+"the user already exist","danger","");						 
+					 handleAlerts(loadProperties("msg.groupuser.add.failed",local,rootURI)+resp.info,"danger","");						 
 				 }
 			}             	 
          },
@@ -610,8 +600,9 @@ var GroupsTable = function () {
 
     return {
         //main function to initiate the module
-        init: function (rootPath) {
+        init: function (rootPath,local_value) {
         	rootURI=rootPath;
+        	local=local_value; 
         	handleTable();  
         	AddGroupValidation();
         	EditGroupValidation(); 

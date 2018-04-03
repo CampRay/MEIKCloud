@@ -11,7 +11,6 @@ package com.nuvomed.action;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,9 +22,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.nuvomed.commons.ConvertTools;
 import com.nuvomed.commons.MyException;
-import com.nuvomed.dto.TadminNodes;
 import com.nuvomed.dto.TadminUser;
-import com.nuvomed.dto.Trecords;
 import com.nuvomed.model.DataTableParamter;
 import com.nuvomed.model.PagingData;
 import com.nuvomed.service.RecordsService;
@@ -41,7 +38,6 @@ import com.nuvomed.service.RecordsService;
 @RequestMapping(value="records")
 public class RecordsController extends BaseController {
 
-	private Logger logger = Logger.getLogger(RecordsController.class);
 	
 	@Resource
 	private RecordsService recordsService;

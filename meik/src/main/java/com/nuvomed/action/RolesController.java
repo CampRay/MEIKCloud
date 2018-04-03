@@ -13,7 +13,6 @@ import java.util.Arrays;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,9 +42,7 @@ import com.nuvomed.service.AdminRoleService;
  */
 @Controller
 @RequestMapping(value="roles")
-public class RolesController extends BaseController {
-
-	private Logger logger = Logger.getLogger(RolesController.class);
+public class RolesController extends BaseController {	
 
 	@Resource
 	private AdminRoleService adminRoleService;

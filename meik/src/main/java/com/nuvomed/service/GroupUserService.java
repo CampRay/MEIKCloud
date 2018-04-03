@@ -12,6 +12,7 @@ public interface GroupUserService {
 	TgroupUser getGroupUserById(int id);
 	
 	TgroupUser getGroupUser(int groupId, String adminId);
+	public List<TgroupUser> getGroupUser(String adminId);
 	
 	List<TgroupUser> getAllGroupUsers();
 	
@@ -35,6 +36,7 @@ public interface GroupUserService {
 	
 
 	public List<TadminUser> getGroupManagerIdsByUser(TadminUser adminUser);
-	public List<TadminUser> getGroupManagerIdsByUser(String adminUserID);
+	public List<TadminUser> getGroupManagerIdsByUser(String adminUserID);	
+	public List<TadminUser> getGroupDoctorsByUser(String adminUserID);
 		
 }

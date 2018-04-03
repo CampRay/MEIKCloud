@@ -2,7 +2,6 @@ package com.nuvomed.action;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,8 +26,7 @@ import com.nuvomed.service.GroupUserService;
 @Controller
 @RequestMapping(value="group")
 public class GroupController extends BaseController {
-	private Logger logger = Logger.getLogger(GroupController.class);	
-	
+		
 	@Resource
 	private AdminUserService adminUserService;
 	
@@ -49,8 +47,7 @@ public class GroupController extends BaseController {
 	public ModelAndView groups(HttpServletRequest request){
 		ModelAndView mav=new ModelAndView();		
 		TadminUser tUser=getSessionUser(request);
-		if(tUser!=null){
-			//mav.addObject("rolesList", adminRoleService.getAllAdminRoles());
+		if(tUser!=null){					
 			mav.addObject("adminList", adminUserService.loadAllAdminUserList());
 			mav.setViewName("group/groups");
 		}
@@ -115,8 +112,12 @@ public class GroupController extends BaseController {
 		JSONObject respJson = new JSONObject();		
 		try{	
 			Tgroup temp=groupService.loadGroupByName(group.getGroupName());
+			//如果修改后的组名已经存在，则不能修改
 			if(temp==null||temp.getId()==group.getId()){
-				groupService.updateGroup(group);
+				temp=groupService.getGroupById(group.getId());
+				temp.setGroupName(group.getGroupName());
+				temp.setGroupInfo(group.getGroupInfo());
+				groupService.updateGroup(temp);
 				respJson.put("status", true);
 			}
 			else{				

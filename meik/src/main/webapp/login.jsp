@@ -13,7 +13,7 @@
 <!-- BEGIN HEAD -->
 <head>
 <meta charset="utf-8"/>
-<title>Login Form</title>
+<title><s:message code="login.title"/></title>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <meta content="" name="description"/>
@@ -87,19 +87,14 @@
 			</div>
 		</div>
 		<div class="form-actions">
-			<label class="checkbox">
-			<input type="checkbox" name="remember" value="1"/> <s:message code="login.form.rememberme"/> </label>
-			<button type="submit" class="btn green pull-right">
+			
+			<button type="submit" class="btn green btn-block">
 			<s:message code="login.form.login"/> <i class="m-icon-swapright m-icon-white"></i>
 			</button>
 		</div>		
 		<div class="forget-password">
-			<h4>Forgot your password ?</h4>
-			<p>
-				 no worries, click <a href="javascript:;" id="forget-password">
-				here </a>
-				to reset your password.
-			</p>
+			<h4><s:message code="login.form.forgot"/></h4>
+			<p><s:message code="login.form.reset1"/><a href="javascript:;" id="forget-password"> <s:message code="login.form.reset2"/> </a><s:message code="login.form.reset3"/></p>
 		</div>
 		<div class="create-account">
 		
@@ -108,10 +103,8 @@
 	<!-- END LOGIN FORM -->
 	<!-- BEGIN FORGOT PASSWORD FORM -->
 	<form class="forget-form" action="ResetPassword" method="post">
-		<h3>Forget Password ?</h3>
-		<p>
-			 Enter your e-mail address below to reset your password.
-		</p>
+		<h3><s:message code="login.form.forgot"/></h3>
+		<p><s:message code="login.form.forgot.enter.email"/></p>
 		<div class="form-group">
 			<div class="input-icon">
 				<i class="fa fa-envelope"></i>
@@ -120,9 +113,9 @@
 		</div>
 		<div class="form-actions">
 			<button type="button" id="back-btn" class="btn">
-			<i class="m-icon-swapleft"></i> Back </button>
+			<i class="m-icon-swapleft"></i> <s:message code="login.form.back"/> </button>
 			<button type="submit" class="btn green pull-right">
-			Submit <i class="m-icon-swapright m-icon-white"></i>
+			<s:message code="login.form.submit"/> <i class="m-icon-swapright m-icon-white"></i>
 			</button>
 		</div>
 	</form>

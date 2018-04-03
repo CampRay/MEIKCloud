@@ -101,4 +101,18 @@ public class GroupUserDao extends BaseDao<TgroupUser> {
 		List<TadminUser> adminIdList= query.list();
 		return adminIdList;					
 	}
+	
+	/**
+	 * 查找出所有和指定用户是一个组的报表管理者或医生的帐户
+	 * @param adminUser
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<TadminUser> getDoctorsByUser(String adminUserID) {
+		String hql="select g.adminUser from TgroupUser as g where g.group.id in (select gu.group.id from TgroupUser gu where gu.adminUser.adminId=?) and (g.adminUser.adminRole.roleId=3 or g.adminUser.adminRole.roleId=4)";
+		Query query=currentSession().createQuery(hql);
+		query.setParameter(0, adminUserID);		
+		List<TadminUser> adminIdList= query.list();
+		return adminIdList;					
+	}
 }

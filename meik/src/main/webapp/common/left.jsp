@@ -97,7 +97,7 @@
 			<li class="${classStr}">															
 				<a href="${hasSubMenu?'javascript;':menuUri}">
 				<i class="<c:out value="${menu.key.menuIcon}"/>"></i> 
-				<span class="title"><c:out value="${menu.key.name}"/></span>
+				<span class="title"><s:message code="${menu.key.name}"/></span>
 				<c:if test="${selectedNode!=null&&selectedNode.nodeId==menu.key.nodeId}">				
 					<span class="selected"></span>								
 				</c:if>	
@@ -118,7 +118,7 @@
 						<%if(isSupAdmin||(userRights&subMenuBean.getBitFlag())>0){%>
 					   <li class="${(selectedNode!=null&&subMenu.nodeId==selectedNode.nodeId)?'active':''}">
 							<a href="${contextPath}${subMenu.uri}">
-							${subMenu.name}
+							<s:message code="${subMenu.name}"/>							
 							</a>
 						</li>
 						<%} %>

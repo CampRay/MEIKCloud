@@ -16,14 +16,11 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.nuvomed.commons.ConvertTools;
 import com.nuvomed.commons.MyException;
 import com.nuvomed.dto.TadminUser;
-import com.nuvomed.dto.Tlanguage;
 import com.nuvomed.dto.Tlicense;
 import com.nuvomed.model.DataTableParamter;
 import com.nuvomed.model.PagingData;
-import com.nuvomed.service.LanguageService;
 import com.nuvomed.service.LicenseService;
 
 
@@ -31,8 +28,6 @@ import com.nuvomed.service.LicenseService;
 @RequestMapping("/license")
 public class LicenseController extends BaseController{
 	
-	@Autowired
-	private LanguageService languageService;
 	@Autowired
 	private LicenseService licenseService;
 	

@@ -28,7 +28,6 @@ import com.nuvomed.model.DataTableParamter;
 import com.nuvomed.model.PagingData;
 import com.nuvomed.service.AdminJobService;
 import com.nuvomed.service.AdminUserService;
-import com.nuvomed.service.GroupUserService;
 import com.nuvomed.service.UserDataService;
 
 

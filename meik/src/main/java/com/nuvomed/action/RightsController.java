@@ -11,7 +11,6 @@ package com.nuvomed.action;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,9 +37,7 @@ import com.nuvomed.service.AdminNodesService;
  */
 @Controller
 @RequestMapping(value="/rights")
-public class RightsController extends BaseController {
-
-	private Logger logger = Logger.getLogger(RightsController.class);
+public class RightsController extends BaseController {	
 	
 	@Resource
 	private AdminNodesService adminNodesService;

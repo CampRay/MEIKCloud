@@ -6,7 +6,6 @@ import java.io.OutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Controller;
@@ -36,7 +35,7 @@ import com.nuvomed.service.UserDataService;
 @Controller
 @RequestMapping("/jobs")
 public class JobsController extends BaseController{
-	private Logger logger = Logger.getLogger(JobsController.class);	
+	
 	@Autowired
 	private AdminJobService adminJobService;
 	@Autowired

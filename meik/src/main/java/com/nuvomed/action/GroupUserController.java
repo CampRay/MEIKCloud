@@ -2,20 +2,16 @@ package com.nuvomed.action;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.nuvomed.commons.ConvertTools;
 import com.nuvomed.commons.MyException;
-import com.nuvomed.commons.SecurityTools;
-import com.nuvomed.dto.TadminInfo;
 import com.nuvomed.dto.TadminUser;
 import com.nuvomed.dto.TgroupUser;
 import com.nuvomed.model.DataTableParamter;
@@ -29,7 +25,7 @@ import com.nuvomed.service.GroupUserService;
 @Controller
 @RequestMapping(value="groupuser")
 public class GroupUserController extends BaseController {
-	private Logger logger = Logger.getLogger(GroupUserController.class);	
+		
 	
 	@Resource
 	private AdminUserService adminUserService;
@@ -95,6 +91,7 @@ public class GroupUserController extends BaseController {
 				}
 				else{
 					respJson.put("status", false);
+					respJson.put("info", getMessage(request,"system.group.adduser.existed",null));
 				}
 			}
 			else{

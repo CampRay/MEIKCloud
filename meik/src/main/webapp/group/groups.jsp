@@ -344,7 +344,7 @@
 									</div>
 								</div>
 								<div class="form-group">
-									<label class="control-label col-md-3"><s:message code="login.form.password"/><span class="required"> * </span></label>
+									<label class="control-label col-md-3"><s:message code="system.groupuser.password"/><span class="required"> * </span></label>
 									<div class="col-md-9">										
 										<input name="adminUser.password" type="password" class="form-control"/>										
 									</div>
@@ -355,7 +355,7 @@
 										<input name="adminUser.email" class="form-control"/>
 									</div>
 								</div>	
-								 -->								
+								  -->								
 								<div class="form-group">
 									<label class="control-label col-md-3"><s:message code="system.groupuser.select.admin"/><span class="required">* </span></label>
 									<div class="col-md-9">
@@ -429,11 +429,13 @@
 	<script src="<c:url value="/"/>assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js" type="text/javascript"></script>
 	<script src="<c:url value="/"/>assets/global/plugins/bootstrap-modal/js/bootstrap-modalmanager.js" type="text/javascript"></script>
     <script src="<c:url value="/"/>assets/global/plugins/bootstrap-modal/js/bootstrap-modal.js" type="text/javascript"></script>
+    <script src="<c:url value="/"/>assets/global/plugins/jquery-i18n/jquery.i18n.properties-1.0.9.js" type="text/javascript"></script>
 	<!-- END PAGE LEVEL PLUGINS -->
 	<!-- BEGIN PAGE LEVEL SCRIPTS -->
 	<script src="<c:url value="/"/>assets/global/plugins/json/json2.js" type="text/javascript"></script>
 	<script src="<c:url value="/"/>assets/global/scripts/metronic.js" type="text/javascript"></script>
-	<script src="<c:url value="/"/>assets/admin/layout/scripts/layout.js" type="text/javascript"></script>	
+	<script src="<c:url value="/"/>assets/admin/layout/scripts/layout.js" type="text/javascript"></script>
+	<script src="<c:url value="/"/>static/js/common.js"></script>	
 	<script src="<c:url value="/"/>static/js/groupsTableData.js"></script>
 	<script>
 	jQuery(document).ready(function() { 
@@ -441,7 +443,7 @@
 	   Metronic.init(); // init metronic core components
 	   Layout.init(); // init current layout	
 	   //Demo.init(); // init demo features
-	   GroupsTable.init("<c:url value="/"/>");	   
+	   GroupsTable.init("<c:url value="/"/>","${sessionScope.locale}");	   
     	});
 	</script>	
 </body>

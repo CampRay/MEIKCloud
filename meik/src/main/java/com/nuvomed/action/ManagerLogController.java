@@ -23,8 +23,6 @@ import com.nuvomed.service.AdminuserLogService;
 @Controller
 @RequestMapping(value="managerlog")
 public class ManagerLogController extends BaseController {
-
-	//private Logger logger = Logger.getLogger(ManagerLogController.class);
 		
 	@Resource
 	private AdminuserLogService adminuserLogService;

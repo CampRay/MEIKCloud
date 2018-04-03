@@ -104,7 +104,7 @@
 								<label class="col-md-3 control-label"><s:message code="system.management.user.searchform.rolename"/></label>
 								<div class="col-md-9">
 									<select name="adminRole.roleId" class="form-control">
-										<option value="">ALL</option>
+										<option value=""><s:message code="all.status.all"/></option>
 										<c:forEach var="role" items="${rolesList}">
 										<option value="${role.roleId}">${role.roleName}</option>			
 										</c:forEach>		
@@ -118,7 +118,7 @@
 								<div class="col-md-9">
 									<div class="radio-list">
 										<label class="radio-inline">
-										<input type="radio" name="status" value="" checked/>All </label>
+										<input type="radio" name="status" value="" checked/><s:message code="all.status.all"/> </label>
 										<label class="radio-inline">
 										<input type="radio" name="status" value="true"/><s:message code="all.status.enable"/></label>
 										<label class="radio-inline">
@@ -132,8 +132,8 @@
 						<div class="col-md-6">	
 							<div class="form-group">								
 								<div class="col-md-offset-3 col-md-9">
-									<button type="submit" class="btn blue">Search <i class="fa fa-search"></i></button>
-									<button type="reset" class="btn grey-cascade">Reset <i class="fa fa-reply"></i></button>
+									<button type="submit" class="btn blue"><s:message code="all.table.search" /> <i class="fa fa-search"></i></button>
+									<button type="reset" class="btn grey-cascade"><s:message code="all.table.reset" /> <i class="fa fa-reply"></i></button>
 								</div>
 							</div>					
 						</div>
@@ -161,7 +161,7 @@
 								    <a class="btn btn-default btn-sm" data-toggle="modal" href="#delete_users" id="openDeleteadminsModal"><i class="fa fa-trash-o"></i> <s:message code="all.table.delete" /></a>
 								    <div class="btn-group">
 										<a class="btn default" href="#" data-toggle="dropdown">
-										Columns <i class="fa fa-angle-down"></i>
+										<s:message code="all.table.column" /> <i class="fa fa-angle-down"></i>
 										</a>
 										<div id="column_toggler" class="dropdown-menu hold-on-click dropdown-checkboxes pull-right">
 											<label><input type="checkbox" checked data-column="0">Checkbox</label>
@@ -169,7 +169,7 @@
 											<label><input type="checkbox" checked data-column="2"><s:message code="system.management.user.searchform.email"/></label>
 											<label><input type="checkbox" checked data-column="3"><s:message code="system.management.user.searchform.rolename"/></label>
 											<label><input type="checkbox" checked data-column="4"><s:message code="system.management.user.searchform.status"/></label>
-											<label><input type="checkbox"  data-column="5"><s:message code="system.management.user.createdBy"/></label>
+											<label><input type="checkbox" checked  data-column="5"><s:message code="system.management.user.createdBy"/></label>
 											<label><input type="checkbox"  data-column="6"><s:message code="system.management.user.createdTime"/></label>
 											<label><input type="checkbox"  data-column="7"><s:message code="system.management.user.updatedBy"/></label>
 											<label><input type="checkbox"  data-column="8"><s:message code="system.management.user.updatedTime"/></label>
@@ -192,7 +192,7 @@
 											<th><s:message code="system.management.user.createdTime"/></th>
 											<th><s:message code="system.management.user.updatedBy"/></th>
 											<th><s:message code="system.management.user.updatedTime"/></th>
-											<th><s:message code="all.table.title"/></th>
+											
 										</tr>
 									</thead>
 																						
@@ -273,52 +273,12 @@
 					</div>					
 				</div>				
 				<!-- END ADD MODAL FORM-->
-				
-				
-			<div class="modal" id="view_log" tabindex="-1" data-width="760">
-					<div class="modal-body">
-					<button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-						<h4 class="modal-title"><s:message code="system.management.user.logtitle" /></h4>
-					</div>
-				
-				<div class="row">
-					<div class="col-md-12">
-				
-						<!-- BEGIN EXAMPLE TABLE PORTLET-->
-							<!-- BEGIN EXAMPLE TABLE PORTLET-->
-					<div class="portlet box green">
-						<div class="portlet-title">
-								<div class="caption">
-									<i class="fa fa-edit"></i><s:message code="system.management.user.logtablename" />
-								</div>
-						</div>
-						
-						<div class="portlet-body">																
-								<table class="table table-striped table-hover table-bordered" id="managerlog_table">
-									<thead>
-										<tr>
-										    <th><s:message code="system.management.user.searchform.id"/></th>
-											<th><s:message code="system.management.user.logtable.adminame"/></th>
-											<th><s:message code="system.management.user.logtable.content"/></th>
-											<th><s:message code="system.management.user.logtable.level"/></th>
-											<th><s:message code="system.management.user.createdTime"/></th>
 											
-										</tr>
-									</thead>
-																						
-								</table>
-							</div>
-					
-						<!-- END EXAMPLE TABLE PORTLET-->
-					</div> 
-					</div>
-				</div>
-			</div>
 				
 			<div class="modal" id="edit_users" tabindex="-1" data-width="760">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-						<h4 class="modal-title">Edit Users</h4>
+						<h4 class="modal-title"><s:message code="system.management.user.edituser" /></h4>
 					</div>
 					<div id="editFormMsg"></div>
 					<!-- <div class="modal-body"> -->
@@ -476,11 +436,13 @@
 	<script src="<c:url value="/"/>assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js" type="text/javascript"></script>
 	<script src="<c:url value="/"/>assets/global/plugins/bootstrap-modal/js/bootstrap-modalmanager.js" type="text/javascript"></script>
     <script src="<c:url value="/"/>assets/global/plugins/bootstrap-modal/js/bootstrap-modal.js" type="text/javascript"></script>
+    <script src="<c:url value="/"/>assets/global/plugins/jquery-i18n/jquery.i18n.properties-1.0.9.js" type="text/javascript"></script>
 	<!-- END PAGE LEVEL PLUGINS -->
 	<!-- BEGIN PAGE LEVEL SCRIPTS -->
 	<script src="<c:url value="/"/>assets/global/plugins/json/json2.js" type="text/javascript"></script>
 	<script src="<c:url value="/"/>assets/global/scripts/metronic.js" type="text/javascript"></script>
 	<script src="<c:url value="/"/>assets/admin/layout/scripts/layout.js" type="text/javascript"></script>	
+	<script src="<c:url value="/"/>static/js/common.js"></script>
 	<script src="<c:url value="/"/>static/js/managersTableData.js"></script>
 	<script>
 	jQuery(document).ready(function() { 
@@ -488,7 +450,7 @@
 	   Metronic.init(); // init metronic core components
 	   Layout.init(); // init current layout	
 	   //Demo.init(); // init demo features
-	   ManagersTable.init("<c:url value="/"/>");	   
+	   ManagersTable.init("<c:url value="/"/>","${sessionScope.locale}");	   
     	});
 	</script>	
 </body>

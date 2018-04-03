@@ -18,9 +18,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,7 +43,7 @@ import com.nuvomed.service.AdminUserService;
 @RequestMapping(value="userprofile")
 public class AdminInfoController extends BaseController {
 
-	private Logger logger = Logger.getLogger(AdminInfoController.class);
+	
 	@Autowired
 	private AdminInfoService adminInfoService;
 	

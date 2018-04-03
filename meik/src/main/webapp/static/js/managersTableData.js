@@ -1,58 +1,10 @@
-//jquery插件把表单序列化成json格式的数据start 
-(function($){
-    $.fn.serializeJson=function(){
-        var serializeObj={};
-        var array=this.serializeArray();
-        var str=this.serialize();
-        $(array).each(function(){
-            if(serializeObj[this.name]){
-                if($.isArray(serializeObj[this.name])){
-                    serializeObj[this.name].push(this.value);
-                }else{
-                    serializeObj[this.name]=[serializeObj[this.name],this.value];
-                }
-            }else{
-                serializeObj[this.name]=this.value;
-            }
-        });
-        return serializeObj;
-    };
-})(jQuery);
-
 var rootURI="/";
+var local="en_US";
+
 var ManagersTable = function () {
-	var oTable;
-	var oLogTable;
+	var oTable;	
 	var selected = [];
-	var handleTable = function () {				
-		var viewTable = function(ids){			
-			var logTable=$('#managerlog_table');
-			oLogTable = logTable.dataTable({
-				"lengthChange":false,
-		    	"filter":false,
-		    	"sort":false,
-		    	"info":true,
-		    	"bRetrieve": true,
-		    	"processing":true,
-		    	"bDestroy":true,
-		    	"scrollX":"100%",
-	           	"scrollXInner":"100%",
-		        // set the initial value
-		        "displayLength": 3,
-		        "dom": "t<'row'<'col-md-6'i><'col-md-6'p>>",
-		        "columns": [
-		 	           { title: "ID",   data: "id" },
-		 	           { title: "Admin Name",   data: "adminId" },
-		 	           { title: "Content",  data: "content"},
-		 	           { title: "Level", data: "level"},
-		 	           { title: "Create Time", data: "createdTimeStr" },
-		 	        ],
-     	        "serverSide": true,
-     	        "serverMethod": "GET",
-     	        "ajaxSource": rootURI+"managerlog/managerslogList/"+ids+"?rand="+Math.random()
-			});	
-		};
-	
+	var handleTable = function () {							
 		var table=$('#adminusers_table');
 		 oTable = table.dataTable({
 			"lengthChange":false,
@@ -60,50 +12,44 @@ var ManagersTable = function () {
         	"sort":false,
         	"info":true,
         	"processing":true,
-        	"scrollX":"100%",
-           	"scrollXInner":"100%",
-            "displayLength": 10,
+            "displayLength": 15,
             "dom": "t<'row'<'col-md-6'i><'col-md-6'p>>",
+            "oLanguage": {
+                "sProcessing": loadProperties("dataTable.page.process",local,rootURI),                
+                "sZeroRecords":loadProperties("dataTable.page.data.zero",local,rootURI),
+                "sEmptyTable": loadProperties("dataTable.page.data.empty",local,rootURI),
+                "sInfo": loadProperties("dataTable.page.info",local,rootURI),
+                "sInfoEmpty":loadProperties("dataTable.page.info.empty",local,rootURI),
+            },
             "columnDefs": [{                    
                     'targets': 0,   
                     'render':function(data,type,row){
                     	return '<div class="checker"><span><input type="checkbox" class="checkboxes"/></span></div>';
-                    },
-                    //'defaultContent':'<div class="checker"><span><input type="checkbox" class="checkboxes" value="1"/></span></div>'                    
-                },
-                {                	
-                	'targets':-1,
-                	'data':null,//定义列名
-                	'render':function(data,type,row){
-                    	//return '<div class="actions"><a class="btn btn-default btn-sm" data-toggle="modal"  href="#view_log" id="openrluesviewmodal">view</a></div>';
-                		return '<div class="actions"><a  class="btn btn-sm dark" data-toggle="modal"  href="#view_log" id="openrluesviewmodal">view</a></div>';
-                    },
-                    'class':'center'
+                    },                                      
                 }
             ],
             "columns": [
                {"orderable": false },
-	           { title: "ID",   data: "adminId"  },
-	           { title: "Email",   data: "email" },
-	           { title: "Role Name",    data: "roleName" },
-	           { title: "Status",  
-	 	        'render':function(data,status,row){
+	           { data: "adminId"  },
+	           { data: "email" },
+	           { data: "roleName" },
+	           { 'render':function(data,status,row){
 	        				var tem = row.status;
 	        				var str = '';
 	        				if(tem==1){
-	        					str = 'Active';
+	        					str = loadProperties("dataTable.page.status.active",local,rootURI);
 	        				}else if(tem==0){
-	        					str = 'Inactive';
+	        					str = loadProperties("dataTable.page.status.inactive",local,rootURI);
 	        				}
 	        				return str;
 	        			}
 	           },
 
-	           { title: "Created By", data: "createdBy",defaultContent:"" ,"bVisible":false},
-	           { title: "Created Time", data: "createdTimeStr",defaultContent:"", "bVisible":false},
-	           { title: "Updated By",  data: "updatedBy",defaultContent:"" ,"bVisible":false},
-	           { title: "Updated Time",    data: "updatedTimeStr" ,defaultContent:"","bVisible":false},  
-	           { title: "Action" ,"class":"center"},
+	           { data: "createdBy",defaultContent:"" },
+	           { data: "createdTimeStr",defaultContent:"", "bVisible":false},
+	           { data: "updatedBy",defaultContent:"" ,"bVisible":false},
+	           { data: "updatedTimeStr" ,defaultContent:"","bVisible":false},  
+	           
 	        ],
 	        "serverSide": true,
 	        "serverMethod": "GET",
@@ -114,24 +60,24 @@ var ManagersTable = function () {
 		});		
 		 
 		//打开删除对话框前判断是否已选择要删除的行
-			$("#openDeleteadminsModal").on("click",function(event){
-					if(selected.length==0){
-						handleAlerts("Please select the rows which you want to delete.","warning","");				
-						return false;
-					}
-				});
-			$("#openActiveadminsModal").on("click",function(event){
+		$("#openDeleteadminsModal").on("click",function(event){
 				if(selected.length==0){
-					handleAlerts("Please select the rows which you want to Active.","warning","");				
+					handleAlerts(loadProperties("error.delete.select",local,rootURI),"warning","");				
 					return false;
 				}
 			});
-			$("#openDeactiveadminsModal").on("click",function(event){
-				if(selected.length==0){
-					handleAlerts("Please select the rows which you want to deactive.","warning","");				
-					return false;
-				}
-			});
+		$("#openActiveadminsModal").on("click",function(event){
+			if(selected.length==0){
+				handleAlerts(loadProperties("error.active.select",local,rootURI),"warning","");				
+				return false;
+			}
+		});
+		$("#openDeactiveadminsModal").on("click",function(event){
+			if(selected.length==0){
+				handleAlerts(loadProperties("error.deactive.select",local,rootURI),"warning","");				
+				return false;
+			}
+		});
 		//删除操作
 		$('#deleteBtn').on('click', function (e) {
 			$.ajax( {
@@ -144,10 +90,10 @@ var ManagersTable = function () {
 						 selected=[];						 
 		            	 oTable.api().draw();
 		            	 oTable.$('th span').removeClass();
-		            	 handleAlerts("delete the adminusers successfully.","success","");
+		            	 handleAlerts(loadProperties("msg.user.delete.success",local,rootURI),"success","");
 					 }
 					 else{
-						 handleAlerts("Failed to delete the adminusers. " +data.info,"danger","");
+						 handleAlerts(loadProperties("msg.user.delete.failed",local,rootURI)+data.info,"danger","");
 					 }
 				}             	 
              },
@@ -169,7 +115,7 @@ var ManagersTable = function () {
 						 selected=[];						 
 		            	oTable.api().draw();
 		            	oTable.$('th span').removeClass();
-		            	 handleAlerts("activateBtn the rules successfully.","success","");
+		            	 handleAlerts(loadProperties("msg.user.active.success",local,rootURI),"success","");
 					 }
 					 else{
 						 alert(data.info);
@@ -193,7 +139,7 @@ var ManagersTable = function () {
 						 selected=[];						 
 		            	 oTable.api().draw();
 		            	 oTable.$('th span').removeClass();
-		            	 handleAlerts("deactivateBtn the rules successfully.","success","");
+		            	 handleAlerts(loadProperties("msg.user.deactive.success",local,rootURI),"success","");
 					 }
 					 else{
 						 alert(data.info);
@@ -215,11 +161,11 @@ var ManagersTable = function () {
 		});	
 		$("#openEditRightModal").on("click",function(event){
 			if(selected.length>1){
-				handleAlerts("Only one row can be edited.","warning","");
+				handleAlerts(loadProperties("error.edit.select",local,rootURI),"warning","");
 				event.stopPropagation();
 			}else if(selected.length==0)
 			{
-				handleAlerts("Please choose one row.","warning","");
+				handleAlerts(loadProperties("error.row.select",local,rootURI),"warning","");
 				event.stopPropagation();
 			}
 			else{
@@ -333,10 +279,10 @@ var ManagersTable = function () {
         	 if(status == "success"){  
         		 if(resp.status){						 
 	            	 oTable.api().draw();
-	            	 handleAlerts("Added the data successfully.","success","");		            	 
+	            	 handleAlerts(loadProperties("msg.user.add.success",local,rootURI),"success","");		            	 
 				 }
 				 else{
-					 handleAlerts("Failed to add the data."+resp.info+"the name or email exist","danger","");						 
+					 handleAlerts(loadProperties("msg.user.add.failed",local,rootURI)+resp.info,"danger","");						 
 				 }
 			}             	 
          },
@@ -415,10 +361,10 @@ var ManagersTable = function () {
         		 if(resp.status){
 					 selected=[];
 	            	 oTable.api().draw();
-	            	 handleAlerts("Edited the data successfully.","success","");
+	            	 handleAlerts(loadProperties("msg.user.edit.success",local,rootURI),"success","");
 				 }
 				 else{
-					 handleAlerts("Failed to add the data."+resp.info+"the email is exist","danger","");
+					 handleAlerts(loadProperties("msg.user.edit.failed",local,rootURI)+resp.info,"danger","");
 				 }
 			}             	 
          },
@@ -452,40 +398,41 @@ var ManagersTable = function () {
 					email:true,
 				}
 
-        },
-       invalidHandler: function (event, validator) { //display error alert on form submit              
-            errorDiv.show();                    
-        },
-
-        highlight: function (element) { // hightlight error inputs
-            $(element)
-                .closest('.form-group').addClass('has-error'); // set error class to the control group
-        },
-
-        unhighlight: function (element) { // revert the change done by hightlight
-            $(element)
-                .closest('.form-group').removeClass('has-error'); // set error class to the control group
-        },
-
-        success: function (label) {
-            label
-                .closest('.form-group').removeClass('has-error'); // set success class to the control group
-        },
-        onfocusout:function(element){
-        	$(element).valid();
-        },
-        submitHandler: function (form) { 
-        	errorDiv.hide();
-        	EditUsers();
-        }
-    });
-};
+	        },
+	       invalidHandler: function (event, validator) { //display error alert on form submit              
+	            errorDiv.show();                    
+	        },
+	
+	        highlight: function (element) { // hightlight error inputs
+	            $(element)
+	                .closest('.form-group').addClass('has-error'); // set error class to the control group
+	        },
+	
+	        unhighlight: function (element) { // revert the change done by hightlight
+	            $(element)
+	                .closest('.form-group').removeClass('has-error'); // set error class to the control group
+	        },
+	
+	        success: function (label) {
+	            label
+	                .closest('.form-group').removeClass('has-error'); // set success class to the control group
+	        },
+	        onfocusout:function(element){
+	        	$(element).valid();
+	        },
+	        submitHandler: function (form) { 
+	        	errorDiv.hide();
+	        	EditUsers();
+	        }
+	    });
+	};
     
 
     return {
         //main function to initiate the module
-        init: function (rootPath) {
+        init: function (rootPath,local_value) {
         	rootURI=rootPath;
+        	local=local_value;        	
         	handleTable();  
         	AddUsersValidation();
         	EditUsersValidation();        	

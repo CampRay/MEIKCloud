@@ -2,6 +2,7 @@
 <%@ taglib prefix="c"  uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <%@ taglib prefix="s" uri="http://www.springframework.org/tags"%>
+
 <!DOCTYPE html>
 
 <!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
@@ -62,16 +63,6 @@
 <!-- END HEAD -->
 
 <!-- BEGIN BODY -->
-
-<!-- DOC: Apply "page-header-fixed-mobile" and "page-footer-fixed-mobile" class to body element to force fixed header or footer in mobile devices -->
-<!-- DOC: Apply "page-sidebar-closed" class to the body and "page-sidebar-menu-closed" class to the sidebar menu element to hide the sidebar by default -->
-<!-- DOC: Apply "page-sidebar-hide" class to the body to make the sidebar completely hidden on toggle -->
-<!-- DOC: Apply "page-sidebar-closed-hide-logo" class to the body element to make the logo hidden on sidebar toggle -->
-<!-- DOC: Apply "page-sidebar-hide" class to body element to completely hide the sidebar on sidebar toggle -->
-<!-- DOC: Apply "page-sidebar-fixed" class to have fixed sidebar -->
-<!-- DOC: Apply "page-footer-fixed" class to the body element to have fixed footer -->
-<!-- DOC: Apply "page-sidebar-reversed" class to put the sidebar on the right side -->
-<!-- DOC: Apply "page-full-width" class to the body element to have full width page without the sidebar menu -->
 <body class="page-header-fixed">
 
 	<!-- BEGIN HEADER -->
@@ -99,7 +90,7 @@
 					<div class="row">
 						<div class="col-md-6">					
 							<div class="form-group">
-								<label class="col-md-3 control-label"><s:message code="system.management.license.search.licensekey" /></label>
+								<label class="col-md-3 control-label"><s:message code="license.key" /></label>
 								<div class="col-md-9">
 									<input name="license" type="text" class="form-control">							
 								</div>
@@ -111,7 +102,7 @@
 								<div class="col-md-9">
 									<div class="radio-list">
 										<label class="radio-inline">
-										<input type="radio" name="status" value="" checked/>All </label>
+										<input type="radio" name="status" value="" checked/><s:message code="all.status.all"/> </label>
 										<label class="radio-inline">
 										<input type="radio" name="status" value="true"/><s:message code="all.status.enable" /> </label>
 										<label class="radio-inline">
@@ -125,8 +116,8 @@
 						<div class="col-md-6">	
 							<div class="form-group">								
 								<div class="col-md-offset-3 col-md-9">
-									<button type="submit" class="btn blue">Search <i class="fa fa-search"></i></button>
-									<button type="reset" class="btn grey-cascade">Reset <i class="fa fa-reply"></i></button>
+									<button type="submit" class="btn blue"><s:message code="all.table.search"/> <i class="fa fa-search"></i></button>
+									<button type="reset" class="btn grey-cascade"><s:message code="all.table.reset"/> <i class="fa fa-reply"></i></button>
 								</div>
 							</div>					
 						</div>
@@ -153,17 +144,18 @@
 								    <a class="btn btn-default btn-sm" data-toggle="modal" href="#deactive_licenses" id="openDeactiveLicenseModal"><i class="fa fa-trash-o"></i> <s:message code="all.table.deactivate" /></a>
 								    <div class="btn-group">
 										<a class="btn default" href="#" data-toggle="dropdown">
-										Columns <i class="fa fa-angle-down"></i>
+										<s:message code="all.table.column" /> <i class="fa fa-angle-down"></i>
 										</a>
 										<div id="column_toggler" class="dropdown-menu hold-on-click dropdown-checkboxes pull-right">
 											<label><input type="checkbox" checked data-column="0">Checkbox</label>
 											<label><input type="checkbox" checked data-column="1"><s:message code="license.key"/></label>
-											<label><input type="checkbox" checked data-column="2"><s:message code="license.username"/></label>
-											<label><input type="checkbox" checked data-column="3"><s:message code="license.deadline"/></label>
-											<label><input type="checkbox" checked data-column="4"><s:message code="license.cpu"/></label>
-											<label><input type="checkbox" checked data-column="5"><s:message code="license.created.time"/></label>
-											<label><input type="checkbox" checked data-column="5"><s:message code="license.active.time"/></label>											
-											<label><input type="checkbox" checked data-column="6"><s:message code="license.status"/></label>											
+											<label><input type="checkbox" checked data-column="2"><s:message code="license.type"/></label>
+											<label><input type="checkbox" checked data-column="3"><s:message code="license.username"/></label>
+											<label><input type="checkbox" checked data-column="4"><s:message code="license.deadline"/></label>
+											<label><input type="checkbox" checked data-column="5"><s:message code="license.cpu"/></label>
+											<label><input type="checkbox" checked data-column="6"><s:message code="license.created.time"/></label>
+											<label><input type="checkbox" checked data-column="7"><s:message code="license.active.time"/></label>											
+											<label><input type="checkbox" checked data-column="8"><s:message code="license.status"/></label>											
 										</div>
 									</div>								    																
 								</div>
@@ -176,6 +168,7 @@
 												<input type="checkbox" class="group-checkable" data-set="#licenses_table .checkboxes"/>
 											</th>
 											<th><s:message code="license.key"/></th>
+											<th><s:message code="license.type"/></th>
 											<th><s:message code="license.username"/></th>
 											<th><s:message code="license.deadline"/></th>
 											<th><s:message code="license.cpu"/></th>
@@ -206,7 +199,16 @@
 								<div class="alert alert-danger display-hide">
 									<button class="close" data-close="alert"></button>
 									<s:message code="system.management.license.addlicense.message"/>
-								</div>								
+								</div>	
+								<div class="form-group">
+									<label class="control-label col-md-3"><s:message code="license.type"/></label>
+									<div class="col-md-9">
+										<select name="type" class="form-control">											
+											<option value="0" selected="selected"><s:message code="license.type.screen"/></option>														
+											<option value="1"><s:message code="license.type.report"/></option>
+										</select>										
+									</div>
+								</div>							
 								<div class="form-group">
 									<label class="control-label col-md-3"><s:message code="license.username"/></label>
 									<div class="col-md-9">										
@@ -273,6 +275,16 @@
 										<input name="deviceId" class="form-control"/>										
 									</div>
 								</div>
+								
+								<div class="form-group">
+									<label class="control-label col-md-3"><s:message code="license.type"/></label>
+									<div class="col-md-9">
+										<select name="type" class="form-control">											
+											<option value="0"><s:message code="license.type.screen"/></option>														
+											<option value="1"><s:message code="license.type.report"/></option>
+										</select>										
+									</div>
+								</div>			
 								<div class="form-group">
 									<label class="control-label col-md-3"><s:message code="license.deadline"/></label>
 									<div class="col-md-5">
@@ -284,7 +296,8 @@
 											</span>
 										</div>
 									</div>
-								</div>								
+								</div>					
+			
 							</div>
 							<div class="form-actions" style="border-top:0;">
 								<div class="row">

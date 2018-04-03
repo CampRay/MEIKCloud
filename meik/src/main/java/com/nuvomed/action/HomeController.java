@@ -13,7 +13,6 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
 import org.hyperic.sigar.CpuPerc;
 import org.hyperic.sigar.Mem;
 import org.hyperic.sigar.Sigar;
@@ -43,8 +42,7 @@ import com.nuvomed.service.AdminUserService;
 @Controller
 @RequestMapping("/home")
 public class HomeController extends BaseController {
-
-	private Logger logger = Logger.getLogger(HomeController.class);
+	
 	
 	@Autowired
 	private AdminUserService adminUserService;		
@@ -54,7 +52,7 @@ public class HomeController extends BaseController {
 		ModelAndView mav=new ModelAndView();
 		TadminUser tUser=getSessionUser(request);
 		if(tUser!=null){
-			mav.setViewName("home/home");
+			mav.setViewName("redirect:/jobs");	
 		}
 		else{
 			tUser=new TadminUser();		

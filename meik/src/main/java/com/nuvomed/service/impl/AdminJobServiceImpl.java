@@ -46,7 +46,6 @@ import com.nuvomed.model.DataTableParamter;
 import com.nuvomed.model.PagingData;
 import com.nuvomed.service.AdminJobService;
 import com.nuvomed.service.AdminUserService;
-import com.nuvomed.service.GroupUserService;
 import com.nuvomed.service.UserService;
 
 /** 
@@ -631,16 +630,14 @@ public class AdminJobServiceImpl implements AdminJobService {
 		String birthday=null;
 		String infoId=null;
 		String cid=null;
-		boolean noParameter=true;
+		
 		if(searchJsonStr!=null&&!searchJsonStr.isEmpty()){			
 			JSONObject jsonObj= (JSONObject)JSON.parse(searchJsonStr);			
 			Set<String> keys=jsonObj.keySet();
-			
-			
+						
 			for (String key : keys) {
 				String val=jsonObj.getString(key);
-				if(val!=null&&!val.isEmpty()){
-					noParameter=false;
+				if(val!=null&&!val.isEmpty()){					
 					if(key=="birthday"){
 						birthday=jsonObj.getString(key);
 					}
@@ -694,17 +691,7 @@ public class AdminJobServiceImpl implements AdminJobService {
 			return new PagingData();
 		}
 		
-//		if(adminUser.getAdminRole().getRoleId()>3){
-//			if(noParameter){
-//				return adminJobDao.findPage("createdTime",false,rdtp.iDisplayStart, rdtp.iDisplayLength);
-//			}
-//			else{
-//				return new PagingData();
-//			}
-//		}
-//		else{
-//			return new PagingData();
-//		}
+
 	}
 	
 	  

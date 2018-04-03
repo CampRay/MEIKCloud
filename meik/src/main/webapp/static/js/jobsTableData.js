@@ -11,9 +11,7 @@ var JobsTable = function () {
 			"lengthChange":false,
         	"filter":true,
         	"sort":false,
-        	"info":true,
-        	"scrollX":"100%",
-        	"scrollXInner":"100%",
+        	"info":true,        	        	
         	"processing":true,                
             // set the initial value
             "displayLength": 30,

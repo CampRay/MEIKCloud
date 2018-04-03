@@ -11,7 +11,7 @@
 <!-- BEGIN HEAD -->
 <head>
 <meta charset="utf-8" />
-<title>System Setting List</title>
+<title><s:message code="setting" /></title>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 <meta content="" name="description" />
@@ -103,43 +103,40 @@
 								<table id="system_setting" class="table table-bordered table-striped">
 									<tbody>
 										<tr>
-											<td style="width: 15%">Email Username</td>
-											<td style="width: 50%"><a href="#" id="email_username" data-type="text" data-pk="1" data-original-title="Enter Email Username"> ${system_setting['Email_Username'][0]} </a></td>
-											<td style="width: 35%"><span class="text-muted"> ${system_setting['Email_Username'][1]} </span></td>
+											<td style="width: 50%"><s:message code="system.setting.email.name" /></td>
+											<td style="width: 50%"><a href="#" id="email_username" data-type="text" data-pk="1" data-original-title="Enter Email Username"> ${system_setting['Email_Username']} </a></td>
 										</tr>
 										<tr>
-											<td style="width: 15%">Email Password</td>
-											<td style="width: 50%"><a href="#" id="email_password" data-type="password" data-pk="1" data-original-title="Enter Email Password"> [hidden] </a></td>
-											<td style="width: 35%"><span class="text-muted"> ${system_setting['Email_Password'][1]} </span></td>
+											<td style="width: 50%"><s:message code="system.setting.email.password" /></td>
+											<td style="width: 50%"><a href="#" id="email_password" data-type="password" data-pk="1" data-original-title="Enter Email Password"> [********] </a></td>
 										</tr>
 										<tr>
-											<td style="width: 15%">Email Host</td>
-											<td style="width: 50%"><a href="#" id="email_host" data-type="text" data-pk="1" data-original-title="Enter Email Host"> ${system_setting['Email_Host'][0]} </a></td>
-											<td style="width: 35%"><span class="text-muted"> ${system_setting['Email_Host'][1]} </span></td>
+											<td style="width: 50%"><s:message code="system.setting.email.host" /></td>
+											<td style="width: 50%"><a href="#" id="email_host" data-type="text" data-pk="1" data-original-title="Enter Email Host"> ${system_setting['Email_Host']} </a></td>
 										</tr>
 
 										<tr>
-											<td style="width: 15%">Max Login Error Times</td>
+											<td style="width: 50%"><s:message code="system.setting.login.error.times" /></td>
 											<td style="width: 50%"><a href="#" id="max_login_error_times" data-type="text" data-pk="1" data-original-title="Enter Max_Login_Error_Times">
-													${system_setting['Max_Login_Error_Times'][0]} </a></td>
-											<td style="width: 35%"><span class="text-muted"> ${system_setting['Max_Login_Error_Times'][1]} </span></td>
+													${system_setting['Max_Login_Error_Times']} </a></td>
 										</tr>
 										<tr>
-											<td style="width: 15%">Login ErrorLocked</td>
-											<td style="width: 50%"><a href="#" id="login_error_locked" data-type="text" data-pk="1" data-original-title="Enter Login_Error_Locked="> ${system_setting['Login_Error_Locked'][0]}
+											<td style="width: 50%"><s:message code="system.setting.login.error.locked" /></td>
+											<td style="width: 50%"><a href="#" id="login_error_locked" data-type="text" data-pk="1" data-original-title="Enter Login_Error_Locked="> ${system_setting['Login_Error_Locked']}
 											</a></td>
-											<td style="width: 35%"><span class="text-muted"> ${system_setting['Login_Error_Locked'][1]} </span></td>
 										</tr>
 										<tr>
-											<td style="width: 15%"><s:message code="system.setting.systemdoctor" /></td>
-											<td style="width: 50%"><a href="#" id="system_doctor" data-type="text" data-pk="1" data-original-title="Enter System Doctor">${system_setting['System_Doctor_Id'][0]} </a></td>
-											<td style="width: 35%"><span class="text-muted"> ${system_setting['System_Doctor_Id'][1]} </span></td>
+											<td style="width: 50%"><s:message code="system.setting.systemdoctor" /></td>
+											<td style="width: 50%"><a href="#" id="system_doctor" data-type="text" data-pk="1" data-original-title="Enter System Doctor">${system_setting['System_Doctor_Id']} </a></td>										
 										</tr>
 										<tr>
-											<td style="width: 15%">Automatically create account for user?</td>
-											<td style="width: 50%"><a href="#" id="create_account" data-type="select" data-pk="1" data-original-title="Whether create account for each users? ">${system_setting['Create_Account'][0]} </a></td>
-											<td style="width: 35%"><span class="text-muted"> ${system_setting['Create_Account'][1]} </span></td>
+											<td style="width: 50%"><s:message code="system.setting.create.account.foruser" /></td>
+											<td style="width: 50%"><a href="#" id="create_account" data-type="select" data-pk="1" data-original-title="Whether create account for each users? ">${system_setting['Create_Account']} </a></td>										
 										</tr>
+										<tr>
+											<td style="width: 50%"><s:message code="system.setting.service.url" /></td>
+											<td style="width: 50%"><a href="#" id="system_doctor" data-type="text" data-pk="1" data-original-title="���뵱ǰϵͳ����ַ">${system_setting['Service_URL']} </a></td>											
+										</tr>	
 									</tbody>
 								</table>
 							</div>

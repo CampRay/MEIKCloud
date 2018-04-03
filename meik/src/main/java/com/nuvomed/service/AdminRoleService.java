@@ -11,6 +11,7 @@ public interface AdminRoleService {
 	TadminRole getAdminRoleById(int roleId);
 	
 	List<TadminRole> getAllAdminRoles();
+	List<TadminRole> getAllWorkRoles();
 	
 	void createAdminRole(TadminRole adminRole);
 	

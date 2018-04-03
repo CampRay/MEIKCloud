@@ -161,7 +161,7 @@ public class ZipUtil {
 	 * @param unzipFilePath 解压后的文件保存的路径
 	 * @param includeZipFileName 解压后的文件保存的路径是否包含压缩文件的文件名。true-包含；false-不包含
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "resource" })
 	public static void unzip(String zipFilePath, String unzipFilePath, boolean includeZipFileName) throws Exception
 	{
 		if (zipFilePath==null || unzipFilePath==null)
@@ -249,7 +249,7 @@ public class ZipUtil {
 	 * @param unzipFilePath 解压后的文件保存的路径
 	 * @param includeZipFileName 解压后的文件保存的路径是否包含压缩文件的文件名。true-包含；false-不包含
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "resource" })
 	public static void unzip(File zipFile, File unzipFileDir) throws Exception
 	{
 		if (zipFile==null || unzipFileDir==null)

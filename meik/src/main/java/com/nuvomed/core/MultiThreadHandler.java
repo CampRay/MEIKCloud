@@ -54,10 +54,8 @@ import com.nuvomed.commons.IniFileTool;
 import com.nuvomed.commons.MyApplicationContextUtil;
 import com.nuvomed.commons.StringTool;
 import com.nuvomed.commons.ZipUtil;
-import com.nuvomed.dto.TadminJob;
 import com.nuvomed.dto.Tuser;
 import com.nuvomed.dto.TuserData;
-import com.nuvomed.service.AdminJobService;
 import com.nuvomed.service.UserDataService;
 import com.nuvomed.service.UserService;
 
@@ -71,9 +69,8 @@ public class MultiThreadHandler implements Runnable {
 	
 	private UserService userService;
 	private UserDataService userDataService;	
-	private AdminJobService adminJobService;
-		
 	
+			
 	private Tuser user;
 	private String zipFilePath;
 	private String unzipFilePath;
@@ -96,7 +93,7 @@ public class MultiThreadHandler implements Runnable {
 	public MultiThreadHandler(int userId) {
 		userService=(UserService)MyApplicationContextUtil.getBeanById("userService");
 		userDataService=(UserDataService)MyApplicationContextUtil.getBeanById("userDataService");
-		adminJobService=(AdminJobService)MyApplicationContextUtil.getBeanById("adminJobService");
+		
 		this.user=userService.getUserById(userId);
 	}
 
@@ -104,7 +101,7 @@ public class MultiThreadHandler implements Runnable {
 		this.user=user;
 		userService=(UserService)MyApplicationContextUtil.getBeanById("userService");
 		userDataService=(UserDataService)MyApplicationContextUtil.getBeanById("userDataService");
-		adminJobService=(AdminJobService)MyApplicationContextUtil.getBeanById("adminJobService");		
+				
 	}
 		
 	

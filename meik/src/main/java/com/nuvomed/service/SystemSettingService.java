@@ -2,6 +2,7 @@ package com.nuvomed.service;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 import com.nuvomed.dto.Tsetting;
 import com.nuvomed.model.PagingData;
@@ -21,10 +22,11 @@ public interface SystemSettingService {
 	void deleteSystemsettingByIds(Integer[] ids);
 	
 	public PagingData loadSystemsetting();
+	
+	public List<Tsetting> getAllSystemSetting();
 
 	public void cachedSystemSettingData() throws UnsupportedEncodingException, IOException;
-	
-	public PagingData getStoreSetting();
+		
 	
 	Tsetting getSystemSettingByName(String name);
 

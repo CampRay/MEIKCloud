@@ -32,6 +32,8 @@ public class Tlicense implements Serializable {
 	private Long createdTime;
 	
 	private String createdTimeStr;
+	
+	private int type;
 
 	public Tlicense() {
 	}
@@ -66,17 +68,9 @@ public class Tlicense implements Serializable {
 		this.deviceId = deviceId;
 	}
 
-
-
-
-
 	public String getLicense() {
 		return license;
 	}
-
-
-
-
 
 	public void setLicense(String license) {
 		this.license = license;
@@ -155,6 +149,16 @@ public class Tlicense implements Serializable {
 
 	public void setCreatedTimeStr(String createdTimeStr) {
 		this.createdTimeStr = createdTimeStr;
+	}
+
+
+	public int getType() {
+		return type;
+	}
+
+
+	public void setType(int type) {
+		this.type = type;
 	}
 		
 
