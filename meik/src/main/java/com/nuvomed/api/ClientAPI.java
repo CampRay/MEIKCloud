@@ -99,7 +99,7 @@ public class ClientAPI {
 		if(jsonObj!=null){
 			String license = jsonObj.getString("license");
 			String cpuid = jsonObj.getString("cpuid");	
-			String deviceId = jsonObj.getString("deviceId");				
+			//String deviceId = jsonObj.getString("deviceId");				
 			if (license==null||license.isEmpty()) {
 				respJson.put("status", 0);
 				respJson.put("info", "The license is required.");
@@ -122,7 +122,7 @@ public class ClientAPI {
 				}
 				else{
 					tLicense.setCpuId(cpuid);
-					tLicense.setDeviceId(deviceId);
+					//tLicense.setDeviceId(deviceId);
 					tLicense.setActiveTime(System.currentTimeMillis());
 					licenseService.updateLicense(tLicense);
 					respJson.put("status", 1);
@@ -211,7 +211,7 @@ public class ClientAPI {
 		if(jsonObj!=null){
 			String license = jsonObj.getString("license");
 			String cpuid = jsonObj.getString("cpuid");	
-			String deviceId = jsonObj.getString("deviceId");				
+			//String deviceId = jsonObj.getString("deviceId");				
 			if (license==null||license.isEmpty()) {
 				respJson.put("status", 0);
 				//respJson.put("info", "The license is required.");
@@ -243,7 +243,7 @@ public class ClientAPI {
 				}
 				else{
 					tLicense.setCpuId(cpuid);
-					tLicense.setDeviceId(deviceId);
+					//tLicense.setDeviceId(deviceId);
 					tLicense.setActiveTime(System.currentTimeMillis());
 					licenseService.updateLicense(tLicense);
 					respJson.put("status", 1);
