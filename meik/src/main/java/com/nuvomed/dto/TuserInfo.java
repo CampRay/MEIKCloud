@@ -17,9 +17,17 @@ public class TuserInfo implements Serializable {
 	//用户帐户ID
 	private String cid;	
 	
-	private TadminUser adminUser;
+	//private TadminUser adminUser;
 
 	private int userId;
+	
+	private Tuser user;	
+	
+	private String code;
+	
+	private String venue;
+	//自动分析结果
+	private Integer result;
 	
 	private Long createdTime;
 	
@@ -28,6 +36,12 @@ public class TuserInfo implements Serializable {
 	private String createdBy;
 	
 	private String language;
+	
+	//身份证号码
+	private String idNumber;
+	
+	//客户全名
+	private String clientName;
 	
 	private String firstName;
 	
@@ -56,6 +70,16 @@ public class TuserInfo implements Serializable {
 	private String zipcode;
 	
 	private String country;
+	
+	//门诊号
+	private String outPatientNumber;
+	//科室号 
+	private String department;
+	//住院号
+	private String hospitalNumber;
+	//床号
+	private String hospitalBedNumber;
+				
 	
 	private String familyBreastCancer;
 	
@@ -367,23 +391,29 @@ public class TuserInfo implements Serializable {
 	private String visualDesc;
 	
 	private Boolean regAgree;
-	
-	private Tuser user;
-
-	private String clientName;
-	private String code;
+		
 	
 	public TuserInfo() {
 	}
 
+	public Integer getResult() {
+		return result;
+	}
+
+	public void setResult(Integer result) {
+		this.result = result;
+	}
+
 	public String getClientName() {
-		clientName=lastName;
-		if(firstName!=null&&!firstName.isEmpty()){
-			clientName=clientName+", "+firstName;
+		if(clientName==null){
+			clientName=lastName;
+			if(firstName!=null&&!firstName.isEmpty()){
+				clientName=clientName+", "+firstName;
+			}
+			if(otherName!=null&&!otherName.isEmpty()){
+				clientName=clientName+" "+otherName;
+			}			
 		}
-		if(otherName!=null&&!otherName.isEmpty()){
-			clientName=clientName+" "+otherName;
-		}			
 		return clientName;	
 	}
 
@@ -391,17 +421,19 @@ public class TuserInfo implements Serializable {
 		this.clientName = clientName;
 	}		
 	
-	public TadminUser getAdminUser() {
-		return adminUser;
-	}
-
-	public void setAdminUser(TadminUser adminUser) {
-		this.adminUser = adminUser;
-	}
+//	public TadminUser getAdminUser() {
+//		return adminUser;
+//	}
+//
+//	public void setAdminUser(TadminUser adminUser) {
+//		this.adminUser = adminUser;
+//	}
 
 	public String getCode() {
-		if(user!=null){
-			this.code=user.getCode();
+		if(code==null){
+			if(user!=null){
+				this.code=user.getCode();
+			}
 		}
 		return this.code;
 	}
@@ -410,6 +442,19 @@ public class TuserInfo implements Serializable {
 		this.code = code;
 	}
 
+	public String getVenue() {
+		if(venue==null){
+			if(user!=null){
+				this.venue=user.getLocation();
+			}
+		}
+		return venue;
+	}
+
+	public void setVenue(String venue) {
+		this.venue = venue;
+	}
+	
 	public int getInfoId() {
 		return infoId;
 	}
@@ -419,9 +464,11 @@ public class TuserInfo implements Serializable {
 	}
 	
 	public String getCid() {
-		if(adminUser!=null){
-			cid=adminUser.getAdminId();
-		}
+//		if(cid==null){
+//			if(adminUser!=null){
+//				cid=adminUser.getAdminId();
+//			}
+//		}
 		return cid;
 	}
 
@@ -574,6 +621,46 @@ public class TuserInfo implements Serializable {
 
 	public void setCountry(String country) {
 		this.country = country;
+	}			
+
+	public String getIdNumber() {
+		return idNumber;
+	}
+
+	public void setIdNumber(String idNumber) {
+		this.idNumber = idNumber;
+	}
+
+	public String getOutPatientNumber() {
+		return outPatientNumber;
+	}
+
+	public void setOutPatientNumber(String outPatientNumber) {
+		this.outPatientNumber = outPatientNumber;
+	}
+
+	public String getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(String department) {
+		this.department = department;
+	}
+
+	public String getHospitalNumber() {
+		return hospitalNumber;
+	}
+
+	public void setHospitalNumber(String hospitalNumber) {
+		this.hospitalNumber = hospitalNumber;
+	}
+
+	public String getHospitalBedNumber() {
+		return hospitalBedNumber;
+	}
+
+	public void setHospitalBedNumber(String hospitalBedNumber) {
+		this.hospitalBedNumber = hospitalBedNumber;
 	}
 
 	public Boolean getFamilyBreastCancer1() {

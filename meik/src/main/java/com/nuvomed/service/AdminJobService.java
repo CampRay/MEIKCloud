@@ -4,8 +4,8 @@ import java.util.List;
 
 import com.nuvomed.dto.TadminJob;
 import com.nuvomed.dto.TadminUser;
-import com.nuvomed.dto.Tuser;
 import com.nuvomed.dto.TuserData;
+import com.nuvomed.dto.TuserInfo;
 import com.nuvomed.model.DataTableParamter;
 import com.nuvomed.model.PagingData;
 
@@ -42,6 +42,8 @@ public interface AdminJobService {
 	List<TadminJob> loadAdminJobList(String adminId,int type);
 	
 	TadminJob loadDownloadedJobByUserCode(String adminId,String code);
+	TadminJob loadDoneJobByUserCode(String adminId,String code);
+	TadminJob loadDoneJobByUserCode(String code);
 	
 	public PagingData loadAdminJobList(DataTableParamter rdtp,TadminUser adminUser);
 	
@@ -53,5 +55,8 @@ public interface AdminJobService {
 		
 	public PagingData loadClientJobList(DataTableParamter rdtp,TadminUser adminUser);
 	
-	public void createScreenData(Tuser user,TuserData userData,String clientNumber,String createdBy);
+	public void createScreenData(TuserInfo userInfo,TuserData userData,String createdBy);
+	public void createReportData(TuserInfo userInfo,TuserData userData,TadminUser createdBy);
+	
+	public void updateReportData(TuserInfo userInfo,TuserData userData,TadminJob adminJob);
 }

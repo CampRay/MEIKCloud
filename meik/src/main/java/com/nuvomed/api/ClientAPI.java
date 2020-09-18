@@ -17,6 +17,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Controller;
@@ -417,41 +418,45 @@ public class ClientAPI {
 		}
 								
 		
-		try{
-										
-			Tuser user=new Tuser();
-			TuserData userData=new TuserData();			
+		try{													
+			//添加用户相关信息表								
+			TuserInfo userInfo=new TuserInfo();
+			userInfo.setCode(jsonObj.getString("code"));
+			//用戶号码，对应管理员表的adminID
+			userInfo.setCid(jsonObj.getString("clientnumber"));
+			//身份证号
+			userInfo.setIdNumber(jsonObj.getString("idnumber"));
+			userInfo.setVenue(jsonObj.getString("venue"));
+			userInfo.setFirstName(jsonObj.getString("firstname"));
+			userInfo.setLastName(jsonObj.getString("lastname"));
+			userInfo.setOtherName(jsonObj.getString("othername"));
+			userInfo.setBirthday(jsonObj.getString("birthday"));
+			userInfo.setMobile(jsonObj.getString("mobile"));
+			userInfo.setEmail(jsonObj.getString("email"));	
 			
-			String clientNumber=jsonObj.getString("clientnumber");
-			user.setCid(jsonObj.getString("cid"));
-			if(user.getCid()!=null&&!user.getCid().isEmpty()){
-				TadminUser newAccount=adminUserService.getAdminUserById(user.getCid());
-				user.setAdminUser(newAccount);
-			}
-			user.setCode(jsonObj.getString("code"));		
-			user.setFirstName(jsonObj.getString("firstname"));
-			user.setLastName(jsonObj.getString("lastname"));		
-			user.setOtherName(jsonObj.getString("othername"));
-			user.setBirthday(jsonObj.getString("birthday"));
-			user.setMobile(jsonObj.getString("mobile"));	
-			user.setEmail(jsonObj.getString("email"));
-			user.setFree(jsonObj.getBoolean("free"));						
-			user.setLocation(jsonObj.getString("venue"));
-			user.setResult(jsonObj.getInteger("result"));
-			user.setGender(true);
-			user.setCreatedBy(admin.getAdminId());
+			//门诊号
+			userInfo.setOutPatientNumber(jsonObj.getString("outpatientnumber"));
+			//科室
+			userInfo.setDepartment(jsonObj.getString("department"));
+			//住院号
+			userInfo.setHospitalNumber(jsonObj.getString("hospitalnumber"));
+			//病床号
+			userInfo.setHospitalBedNumber(jsonObj.getString("hospitalbednumber"));
+			userInfo.setCreatedTime(System.currentTimeMillis());
+			userInfo.setResult(jsonObj.getInteger("result"));
 									
-			
+			TuserData userData=new TuserData();	
 			InputStream inputStream = file.getInputStream();
 			byte [] fileBytes=ConvertTools.toByteArray(inputStream);	
 			userData.setFileName(file.getOriginalFilename());
 			userData.setStream(fileBytes);				
-			userData.setDataType(1);
-			userData.setUserId(user.getUserId());										
+			userData.setDataType(1);											
 			
-			adminJobService.createScreenData(user, userData,clientNumber,admin.getAdminId());
+			adminJobService.createScreenData(userInfo, userData,admin.getAdminId());
 			respJson.put("status", 1);
-			if(user.getResult()!=null&&user.getResult()==-1){
+			//如果自动分析结果有值并且为-1，则表示以前没有自动分析过
+			if(userInfo.getResult()!=null&&userInfo.getResult()==-1){
+				Tuser user=userService.getUserById(userInfo.getUserId());
 				taskExecutor.execute(new MultiThreadHandler(user));
 			}
 																					
@@ -499,40 +504,44 @@ public class ClientAPI {
 			adminJob=new TadminJob();
 		}								
 		
-		try{
-										
-			Tuser user=new Tuser();
-			TuserData userData=new TuserData();			
+		try{													
+			//添加用户相关信息表								
+			TuserInfo userInfo=new TuserInfo();
+			userInfo.setCode(jsonObj.getString("code"));
+			//用戶号码，对应管理员表的adminID
+			userInfo.setCid(jsonObj.getString("clientnumber"));
+			//身份证号
+			userInfo.setIdNumber(jsonObj.getString("idnumber"));
+			userInfo.setVenue(jsonObj.getString("venue"));
+			userInfo.setFirstName(jsonObj.getString("firstname"));
+			userInfo.setLastName(jsonObj.getString("lastname"));
+			userInfo.setOtherName(jsonObj.getString("othername"));
+			userInfo.setBirthday(jsonObj.getString("birthday"));
+			userInfo.setMobile(jsonObj.getString("mobile"));
+			userInfo.setEmail(jsonObj.getString("email"));	
 			
-			String clientNumber=jsonObj.getString("clientnumber");
-			user.setCid(jsonObj.getString("cid"));
-			if(user.getCid()!=null&&!user.getCid().isEmpty()){
-				TadminUser newAccount=adminUserService.getAdminUserById(user.getCid());
-				user.setAdminUser(newAccount);
-			}
-			user.setCode(jsonObj.getString("code"));		
-			user.setFirstName(jsonObj.getString("firstname"));
-			user.setLastName(jsonObj.getString("lastname"));		
-			user.setOtherName(jsonObj.getString("othername"));
-			user.setBirthday(jsonObj.getString("birthday"));
-			user.setMobile(jsonObj.getString("mobile"));	
-			user.setEmail(jsonObj.getString("email"));
-			user.setFree(jsonObj.getBoolean("free"));						
-			user.setLocation(jsonObj.getString("venue"));
-			user.setResult(jsonObj.getInteger("result"));
-			user.setGender(true);
-			user.setCreatedBy(admin.getAdminId());
-									
+			//门诊号
+			userInfo.setOutPatientNumber(jsonObj.getString("outpatientnumber"));
+			//科室
+			userInfo.setDepartment(jsonObj.getString("department"));
+			//住院号
+			userInfo.setHospitalNumber(jsonObj.getString("hospitalnumber"));
+			//病床号
+			userInfo.setHospitalBedNumber(jsonObj.getString("hospitalbednumber"));
+			userInfo.setCreatedTime(System.currentTimeMillis());
+			userInfo.setResult(jsonObj.getInteger("result"));
+				
+			TuserData userData=new TuserData();	
 			//保存上传数据到数据库						
 			userData.setFileName(file.getOriginalFilename());			
 			userData.setStream(file.getBytes());
-			userData.setDataType(1);
-			userData.setUserId(user.getUserId());										
+			userData.setDataType(1);											
 			//創建job並分配給所在組的管理員，如果所在組沒有管理員，則分配給系統醫生
-			adminJobService.createScreenData(user, userData,clientNumber,admin.getAdminId());
+			adminJobService.createScreenData(userInfo, userData,admin.getAdminId());
 			respJson.put("status", 1);
 			
 			//启用线程任务处理报告
+			Tuser user=userService.getUserById(userInfo.getUserId());
 			taskExecutor.execute(new MultiThreadHandler(user));
 			return JSON.toJSONString(respJson);
 															
@@ -697,6 +706,7 @@ public class ClientAPI {
 		JSONObject jsonObj = (JSONObject) JSON.parse(jsonStr);
 		String code=jsonObj.getString("code");
 		//String email=jsonObj.getString("email");
+					
 		String doctor=null;
 		if(!admin.getAdminId().equals(doctorId)){
 			doctor=admin.getAdminId();
@@ -705,12 +715,12 @@ public class ClientAPI {
 		//判断是否已经上传过数据
 		if(adminJob==null){
 			respJson.put("status", 0);
-			respJson.put("info", "Already uploaded.");
+			respJson.put("info", "No report job has been found.");
 			return JSON.toJSONString(respJson);
 		}		
 		
 		Tuser user=adminJob.getUser();				
-		//判断是否是系统医生
+		//判断是否有配置系统医生
 		if(doctorId!=null&&!doctorId.isEmpty()){
 			int dataType=2;
 			if(admin.getAdminId().equals(doctorId)||admin.getAdminRole().getRoleId()==4){//如果是系統醫生或報告管理員				
@@ -726,7 +736,7 @@ public class ClientAPI {
 					if(operator.getAdminInfo()==null||operator.getAdminInfo().getNotify()){					
 						TemaiMessage message=new TemaiMessage();
 						message.setTo(operator.getEmail());
-						message.setText("The MEIK report of client "+user.getCode()+" is done, please log in to your account in the MEIK Server http://cloud.meikasia.com and download the report for this client.");
+						message.setText("The MEIK report of client "+user.getCode()+" is done, please sign in to your account in the MEIK Server http://cloud.meikasia.com and download the report for this client.");
 						message.setSubject("MEIK Report Notification");
 						EMailTool.send(message);
 					}
@@ -899,9 +909,287 @@ public class ClientAPI {
 	}
 	
 	
+	/**
+	 * 国内合并版，上传保存报告数据接口
+	 * @param request
+	 * @param token
+	 * @param jsonStr
+	 * @param file
+	 * @return
+	 */
+	@RequestMapping(value="/saveReport",method=RequestMethod.POST)
+	@ResponseBody
+	public String saveReport(HttpServletRequest request,@RequestHeader("Authorization") String token,String jsonStr,@RequestParam(value = "file", required = false) MultipartFile file){		
+		TadminUser admin=adminUserService.getTadminUsersByToken(token);
+		JSONObject respJson = new JSONObject();	
+		if (admin== null) {
+			respJson.put("status", 0);	
+			respJson.put("info", "The user is not logged in or has an invalid session.");
+			return JSON.toJSONString(respJson);
+		}
+		
+		JSONObject jsonObj = (JSONObject) JSON.parse(jsonStr);
+		String code=jsonObj.getString("code");
+		String clientNumber=jsonObj.getString("clientnumber");
+		String email=jsonObj.getString("email");
+		String idNumber=jsonObj.getString("idnumber");
+		String firstname=jsonObj.getString("firstname");
+		String lastname=jsonObj.getString("lastname");		
+		String birthday=jsonObj.getString("birthday");
+		String mobile=jsonObj.getString("mobile");
+		String venue=jsonObj.getString("venue");
+		//是否让服务端自动生成报告
+		int autoResult=jsonObj.getIntValue("result");
+		String outPatientNumber=jsonObj.getString("outpatientnumber");
+		String department=jsonObj.getString("department");
+		String hospitalNumber=jsonObj.getString("hospitalnumber");
+		String hospitalBedNumber=jsonObj.getString("hospitalbednumber");
+		
+		//检查编号不能为空
+		if (StringUtils.isBlank(code)) {
+			respJson.put("status", 0);
+			respJson.put("info", "The parameter code is required.");
+			return JSON.toJSONString(respJson);
+		}
+		if(file.isEmpty()){
+			respJson.put("status", 0);
+			respJson.put("info", "No report file has been uploaded or the report file has no content.");
+			return JSON.toJSONString(respJson);
+		}
+		
+		try{	
+			//先判断当前报告档案是否是分配的服务中心报告任务
+			String doctorId=SystemConfig.Admin_Setting_Map.get("System_Doctor_Id");
+			String doctor=null;
+			if(!admin.getAdminId().equals(doctorId)){
+				doctor=admin.getAdminId();
+			}
+			//查看是是否是报告任务
+			TadminJob adminJob=adminJobService.loadDownloadedJobByUserCode(doctor, code);
+			//如果是则继续完成报告任务
+			if(adminJob!=null){
+				Tuser user=adminJob.getUser();				
+				//判断是否有配置系统医生
+				if(doctorId!=null&&!doctorId.isEmpty()){
+					int dataType=2;
+					if(admin.getAdminId().equals(doctorId)||admin.getAdminRole().getRoleId()==4){//如果是系統醫生或報告管理員				
+						dataType=3;				
+						if(adminJob.getType()==3){
+							adminJob.setDoneTime(System.currentTimeMillis());
+						}
+						adminJob.setType(7);			
+						adminJob.setCloseTime(System.currentTimeMillis());						
+					}
+					else{//否則是普通醫生
+						dataType=2;
+						//设置任务状态为等待系统医生下载状态
+						adminJob.setDoneTime(System.currentTimeMillis());
+						adminJob.setType(5);
+						try{					
+							//查询操作员所在组的系统医生（报表管理员）帐号		
+							List<TadminUser> systemDocotrList=groupUserService.getGroupManagerIdsByUser(adminJob.getCreatedBy());
+							TadminUser systemDoctor=null;
+							if(systemDocotrList.size()>0){
+								systemDoctor=systemDocotrList.get(0);						
+							}
+							else{//如果用户组中没有管理員帐号，则指定Screen数据给系统配置的系统医生						
+								systemDoctor=adminUserService.getAdminUserById(doctorId);						
+							}
+							adminJob.setAdminUser(systemDoctor);							
+						}
+						catch(Exception e){}
+					}
+					
+					//保存上传数据						
+					List<TuserData> userDataList=null;
+					if(dataType==2){
+						userDataList=userDataService.loadUserReportDataList(user.getUserId());
+					}
+					else if(dataType==3){
+						userDataList=userDataService.loadSysDoctorReportDataList(user.getUserId());
+					}
+					
+					if(userDataList==null||userDataList.size()==0){
+						//保存上传数据
+						TuserData userData=new TuserData();
+						InputStream inputStream;
+						try {
+							inputStream = file.getInputStream();
+							byte [] fileBytes=ConvertTools.toByteArray(inputStream);
+									
+							userData.setFileName(file.getOriginalFilename());
+							userData.setStream(fileBytes);	
+							userData.setUserId(user.getUserId());
+							userData.setDataType(dataType);
+							userDataService.createUserData(userData);
+						} catch (Exception e) {			
+							respJson.put("status", 0);
+							respJson.put("info", "Failed to upload file.");
+							return JSON.toJSONString(respJson);
+						}	
+					}
+					else{
+						//保存上传数据
+						TuserData userData=userDataList.get(userDataList.size()-1);
+						InputStream inputStream;
+						try {
+							inputStream = file.getInputStream();
+							byte [] fileBytes=ConvertTools.toByteArray(inputStream);
+									
+							userData.setFileName(file.getOriginalFilename());
+							userData.setStream(fileBytes);	
+							userData.setUserId(user.getUserId());
+							userData.setDataType(dataType);
+							userDataService.updateUserData(userData);
+						} catch (Exception e) {			
+							respJson.put("status", 0);
+							respJson.put("info", "Failed to upload file.");
+							return JSON.toJSONString(respJson);
+						}	
+					}			
+					adminJobService.updateAdminJob(adminJob);
+				}
+				else{
+					respJson.put("status",0);	
+					respJson.put("info", "Cloud server setting error.");
+				}
+			}
+			else{//否则直接保存报告档案，并一次性创建一个完成的报告任务			
+				TuserData userData=new TuserData();		
+				InputStream inputStream = file.getInputStream();
+				byte [] fileBytes=ConvertTools.toByteArray(inputStream);	
+				userData.setFileName(file.getOriginalFilename());
+				userData.setStream(fileBytes);		
+				userData.setDataType(2);
+				
+				//添加用户相关信息表								
+				TuserInfo userInfo=new TuserInfo();
+				userInfo.setCode(code);
+				userInfo.setCid(clientNumber);
+				//身份证号
+				userInfo.setIdNumber(idNumber);
+				userInfo.setVenue(venue);
+				userInfo.setFirstName(firstname);
+				userInfo.setLastName(lastname);			
+				userInfo.setBirthday(birthday);
+				userInfo.setMobile(mobile);
+				userInfo.setEmail(email);	
+				//门诊号
+				userInfo.setOutPatientNumber(outPatientNumber);
+				//科室
+				userInfo.setDepartment(department);
+				//住院号
+				userInfo.setHospitalNumber(hospitalNumber);
+				//病床号
+				userInfo.setHospitalBedNumber(hospitalBedNumber);
+				userInfo.setCreatedTime(System.currentTimeMillis());
+				userInfo.setResult(autoResult);
+										
+				//查询当前登录用户是否已经上传过此检查病人的报告
+				adminJob=adminJobService.loadDoneJobByUserCode(code);
+				//判断报告任务记录是否存在,如果没有存在，则添加
+				if(adminJob==null){								
+					//查询指定code的检测用户记录是否存在								
+					adminJobService.createReportData(userInfo, userData,admin);							
+				}		
+				else{				
+					adminJob.setAdminUser(admin);
+					adminJobService.updateReportData(userInfo,userData,adminJob);				
+				}
+			}
+			respJson.put("status", 1);							
+		}catch (Exception e) {		
+			respJson.put("status", 0);	
+			respJson.put("info", "Failed to upload report data."+e.getMessage());
+			return JSON.toJSONString(respJson);
+		}						
+		
+		respJson.put("status", 1);	
+		return JSON.toJSONString(respJson);
+	}
+			
 	
 	/**
-	 * 获取所有检查数据列表
+	 * 国内合并版，上传PDF报告数据接口
+	 * @param request
+	 * @param token
+	 * @param jsonStr
+	 * @param file
+	 * @return
+	 */
+	@RequestMapping(value="/savePDF",method=RequestMethod.POST)
+	@ResponseBody
+	public String savePDFFile(HttpServletRequest request,@RequestHeader("Authorization") String token,String jsonStr,@RequestParam(value = "file", required = false) MultipartFile file){
+		//String doctorId=SystemConfig.Admin_Setting_Map.get("System_Doctor_Id");
+		TadminUser admin=adminUserService.getTadminUsersByToken(token);
+		JSONObject respJson = new JSONObject();	
+		if (admin== null) {
+			respJson.put("status", 0);	
+			respJson.put("info", "The user is not logged in or has an invalid session.");
+			return JSON.toJSONString(respJson);
+		}
+		
+		JSONObject jsonObj = (JSONObject) JSON.parse(jsonStr);
+//		String doctor=null;
+//		if(!admin.getAdminId().equals(doctorId)){
+//			doctor=admin.getAdminId();
+//		}					
+		TadminJob adminJob=adminJobService.getAdminJobByCode(jsonObj.getString("code"));
+		//判断是否已经上传过数据
+		if(adminJob==null){
+			respJson.put("status", 0);
+			respJson.put("info", "No user data found on server");
+			return JSON.toJSONString(respJson);
+		}
+		
+		Tuser user=adminJob.getUser();
+		List<TuserData> userDataList=userDataService.loadUserReportPdfList(user.getUserId());
+		if(userDataList==null||userDataList.size()==0){
+			//保存上传数据
+			TuserData userData=new TuserData();
+			InputStream inputStream;
+			try {
+				inputStream = file.getInputStream();
+				byte [] fileBytes=ConvertTools.toByteArray(inputStream);
+						
+				userData.setFileName(file.getOriginalFilename());
+				userData.setStream(fileBytes);	
+				userData.setUserId(user.getUserId());
+				userData.setDataType(4);
+				userDataService.createUserData(userData);
+			} catch (Exception e) {			
+				respJson.put("status", 0);
+				respJson.put("info", "Failed to upload file.");
+				return JSON.toJSONString(respJson);
+			}	
+		}
+		else{
+			//保存上传数据
+			TuserData userData=userDataList.get(userDataList.size()-1);
+			InputStream inputStream;
+			try {
+				inputStream = file.getInputStream();
+				byte [] fileBytes=ConvertTools.toByteArray(inputStream);
+						
+				userData.setFileName(file.getOriginalFilename());
+				userData.setStream(fileBytes);	
+				userData.setUserId(user.getUserId());
+				userData.setDataType(4);
+				userDataService.updateUserData(userData);
+			} catch (Exception e) {			
+				respJson.put("status", 0);
+				respJson.put("info", "Failed to upload file.");
+				return JSON.toJSONString(respJson);
+			}	
+		}
+		respJson.put("status", 1);	
+		return JSON.toJSONString(respJson);
+	}
+	
+	
+	
+	/**
+	 * 医生获取可下载的所有分配给他的检查数据列表
 	 * @param response
 	 * @param jsonStr
 	 * @return
@@ -1489,4 +1777,84 @@ public class ClientAPI {
 		return JSON.toJSONString(respJson);
 	}
 	
+	/**
+	 * 查询搜索所有已归档的档案列表
+	 * @param response
+	 * @param jsonStr
+	 * @return
+	 */
+	@RequestMapping(value="/searchDataList",method=RequestMethod.POST)
+	@ResponseBody
+	public String searchReportDataList(@RequestHeader("Authorization") String token,@RequestBody String jsonStr){
+		TadminUser admin=adminUserService.getTadminUsersByToken(token);
+		JSONObject respJson = new JSONObject();	
+		if (admin== null) {
+			respJson.put("status", 0);	
+			respJson.put("info", "The user is not logged in or has an invalid session.");
+			return JSON.toJSONString(respJson);
+		}
+				
+		JSONObject jsonObj = (JSONObject) JSON.parse(jsonStr);
+		if(jsonObj==null){
+			respJson.put("status", 0);				
+			respJson.put("info", "The search parameter is required.");
+			return JSON.toJSONString(respJson);			
+		}
+		
+		String firstName=jsonObj.getString("firstName");
+		String lastName=jsonObj.getString("lastName");		
+		String idNumber=jsonObj.getString("idNumber");
+		String mobile=jsonObj.getString("mobile");
+		String code=jsonObj.getString("code");			
+		
+		List<Tuser> userList=userService.loadUserByInfo(null,null,code,firstName,lastName,null,null,null,mobile,idNumber,admin);		
+		respJson.put("data", userList);
+		respJson.put("status", 1);
+		
+		return JSON.toJSONString(respJson);
+	}
+	
+	/**
+	 * 下载指定用户的报告数据
+	 * @param response
+	 * @param jsonStr
+	 * @return
+	 */
+	@RequestMapping(value="/downloadDataByUser",method=RequestMethod.POST)	
+	public String downloadDataByUser(HttpServletResponse response,@RequestHeader("Authorization") String token,@RequestBody String jsonStr){	
+		TadminUser admin=adminUserService.getTadminUsersByToken(token);		
+		if (admin!= null&&jsonStr != null && !jsonStr.isEmpty()) {				
+			JSONObject jsonObj = (JSONObject) JSON.parse(jsonStr);
+			int userId = jsonObj.getIntValue("userId");				
+			if (userId>0) {				
+				try{
+					//查询医生或系统医生最终上传的报告数据
+					TuserData userData=userDataService.loadDoctorZip(userId);
+					if(userData!=null){
+						String fileName=URLEncoder.encode(userData.getFileName(),"UTF-8");
+						
+						response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+						response.addHeader("Content-Length", ""+userData.getStream().length);
+						response.setContentType("application/octet-stream;charset=UTF-8");
+						OutputStream outputStream = new BufferedOutputStream(response.getOutputStream());  
+						outputStream.write(userData.getStream());  
+						outputStream.flush();  	
+						outputStream.close();
+						
+						
+//						HttpHeaders headers=new HttpHeaders();
+//						headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+//						headers.setContentDispositionFormData("attachment", fileName);
+//						headers.setContentLength(userData.getStream().length);
+//						return new ResponseEntity<byte[]>(userData.getStream(),headers,HttpStatus.OK);
+					}
+				}catch (Exception e) {
+					
+		        }				
+			}							
+		}		
+							
+		return null;
+					
+	}
 }

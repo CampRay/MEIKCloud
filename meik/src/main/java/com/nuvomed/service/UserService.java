@@ -34,6 +34,8 @@ public interface UserService {
 	
 	public List<Tuser> loadUserByInfo(String clientNumber,String cid,String code,String firstName,String lastName,String otherName,String birth,String email,String mobile,TadminUser adminUser);
 	
+	public List<Tuser> loadUserByInfo(String infoId,String cid,String code,String firstName,String lastName,String otherName,String birth,String email,String mobile,String idNumber,TadminUser adminUser);
+	
 	public List<Tuser> loadUserListByCids(List<TadminUser> cidList);
 	
 	public List<Tuser> loadAllUserByInfo(String clientNumber,String cid,String code,String firstName,String lastName,String otherName,String birth,String email,String mobile,TadminUser adminUser);

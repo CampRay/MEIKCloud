@@ -101,8 +101,8 @@ public class TadminJob implements Serializable {
 
 
 	public String getCid() {
-		if(user!=null&&user.getAdminUser()!=null){
-			cid=user.getAdminUser().getAdminId();
+		if(user!=null&&user.getCid()!=null){
+			cid=user.getCid();
 		}
 		return cid;
 	}

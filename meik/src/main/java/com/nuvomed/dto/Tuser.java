@@ -14,7 +14,7 @@ public class Tuser implements java.io.Serializable {
 	private int userId;
 	//用户帐户ID
 	private String cid;
-	private TadminUser adminUser;
+	//private TadminUser adminUser;
 	private String code;
 	private String firstName;
 	private String lastName;
@@ -22,7 +22,7 @@ public class Tuser implements java.io.Serializable {
 	private String createdBy;
 	private Boolean gender;
 	private String birthday;
-	
+	private String idNumber;
 	private String mobile;
 	private String email;
 	private Boolean free;
@@ -36,14 +36,14 @@ public class Tuser implements java.io.Serializable {
 	}
 	
 	
-	public TadminUser getAdminUser() {
-		return adminUser;
-	}
-
-
-	public void setAdminUser(TadminUser adminUser) {
-		this.adminUser = adminUser;
-	}
+//	public TadminUser getAdminUser() {
+//		return adminUser;
+//	}
+//
+//
+//	public void setAdminUser(TadminUser adminUser) {
+//		this.adminUser = adminUser;
+//	}
 
 
 	public String getClientName() {
@@ -71,6 +71,16 @@ public class Tuser implements java.io.Serializable {
 		this.location = location;
 	}
 
+
+
+	public String getIdNumber() {
+		return idNumber;
+	}
+
+
+	public void setIdNumber(String idNumber) {
+		this.idNumber = idNumber;
+	}
 
 
 	public String getFirstName() {
@@ -164,9 +174,9 @@ public class Tuser implements java.io.Serializable {
 
 
 	public String getCid() {
-		if(adminUser!=null){
-			cid=adminUser.getAdminId();
-		}
+//		if(adminUser!=null){
+//			cid=adminUser.getAdminId();
+//		}
 		return cid;
 	}
 

@@ -140,7 +140,11 @@ public class ManagerController extends BaseController {
 				if(adminuser.getPassword()!=null&&!adminuser.getPassword().isEmpty()){
 					dbAdminUser.setPassword(SecurityTools.SHA1(adminuser.getPassword()));
 				}
-				
+				if(!dbAdminUser.getEmail().equals(adminuser.getEmail())){
+					if(adminUserService.getTadminUsersByEmail(adminuser.getEmail())==null){
+						dbAdminUser.setEmail(adminuser.getEmail());
+					}
+				}				
 				dbAdminUser.setAdminRole(adminRoleService.getAdminRoleById(adminuser.getAdminRole().getRoleId()));
 				adminUserService.updateAdminUser(dbAdminUser);
 				respJson.put("status", true);

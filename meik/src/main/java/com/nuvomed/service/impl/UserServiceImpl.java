@@ -30,7 +30,6 @@ import com.nuvomed.dto.Tuser;
 import com.nuvomed.dto.TuserInfo;
 import com.nuvomed.model.DataTableParamter;
 import com.nuvomed.model.PagingData;
-import com.nuvomed.service.AdminUserService;
 import com.nuvomed.service.UserService;
 
 
@@ -49,8 +48,8 @@ public class UserServiceImpl implements UserService {
 	private UserInfoDao userInfoDao;
 	@Autowired
 	private GroupUserDao groupUserDao;
-	@Autowired
-	private AdminUserService adminUserService;
+//	@Autowired
+//	private AdminUserService adminUserService;
 				
 
 	/**
@@ -165,14 +164,18 @@ public class UserServiceImpl implements UserService {
 		criteria=criteria.add(Restrictions.eq("code", code));												
 		return (Tuser)criteria.uniqueResult();			
 	}			
+		
+	public List<Tuser> loadUserByInfo(String infoId,String cid,String code,String firstName,String lastName,String otherName,String birth,String email,String mobile,TadminUser adminUser) {				
+		return loadUserByInfo(infoId,cid,code,firstName,lastName,otherName,birth,email,mobile,null,adminUser);			
+	}
 	
 	@SuppressWarnings("unchecked")
-	public List<Tuser> loadUserByInfo(String clientNumber,String cid,String code,String firstName,String lastName,String otherName,String birth,String email,String mobile,TadminUser adminUser) {
+	public List<Tuser> loadUserByInfo(String infoId,String cid,String code,String firstName,String lastName,String otherName,String birth,String email,String mobile,String idNumber,TadminUser adminUser) {
 		Criteria criteria=userDao.createCriteria();
-		if(clientNumber!=null&&!clientNumber.isEmpty()){
+		if(infoId!=null&&!infoId.isEmpty()){
 			try{				
-			   if(StringTool.isNumber(clientNumber)){
-				   TuserInfo userInfo=userInfoDao.get(Integer.parseInt(clientNumber));
+			   if(StringTool.isNumber(infoId)){
+				   TuserInfo userInfo=userInfoDao.get(Integer.parseInt(infoId));
 				   if(userInfo!=null){
 					   criteria=criteria.add(Restrictions.eq("userId", userInfo.getUserId()));					   
 				   }
@@ -187,14 +190,15 @@ public class UserServiceImpl implements UserService {
 			catch(Exception e){}
 		}
 		if(code!=null&&!code.isEmpty()){
-			criteria=criteria.add(Restrictions.eq("code", code));
+			criteria=criteria.add(Restrictions.like("code", code+"%"));
 		}
 		if(cid!=null&&!cid.isEmpty()){
+			criteria=criteria.add(Restrictions.eq("cid", cid));
 			
-			TadminUser searchAdminUser=adminUserService.getAdminUserByIdOrEmail(cid, cid);
-			if(searchAdminUser!=null){
-				criteria=criteria.add(Restrictions.eq("adminUser", searchAdminUser));
-			}		
+//			TadminUser searchAdminUser=adminUserService.getAdminUserByIdOrEmail(cid, cid);
+//			if(searchAdminUser!=null){
+//				criteria=criteria.add(Restrictions.eq("adminUser", searchAdminUser));
+//			}		
 		}
 		if(firstName!=null&&!firstName.isEmpty()){
 			criteria=criteria.add(Restrictions.eq("firstName", firstName));
@@ -214,6 +218,9 @@ public class UserServiceImpl implements UserService {
 		if(mobile!=null&&!mobile.isEmpty()){
 			criteria=criteria.add(Restrictions.eq("mobile", mobile));
 		}
+		if(idNumber!=null&&!idNumber.isEmpty()){
+			criteria=criteria.add(Restrictions.eq("idNumber", idNumber));
+		}
 		if(adminUser!=null){
 			//如果当前登录的用户角色是admin, Operator或Doctor
 			if(adminUser.getAdminRole().getRoleId()<=3){
@@ -225,13 +232,13 @@ public class UserServiceImpl implements UserService {
 					criteria=criteria.add(Restrictions.eq("createdBy", ""));
 				}
 			}
-			else{//如果是普通用户
-				criteria=criteria.add(Restrictions.eq("adminUser", adminUser));
+			else{//如果是普通用户，只能搜索自已的数据
+				criteria=criteria.add(Restrictions.eq("cid", adminUser.getAdminId()));
 			}
 		}
 		
 		return criteria.list();			
-	}	
+	}
 	
 	
 	@SuppressWarnings("unchecked")
@@ -243,7 +250,7 @@ public class UserServiceImpl implements UserService {
 	
 	/**
 	 * 根據用戶信息搜索同一用戶帳號下的所有用戶數據
-	 * @param clientNumber
+	 * @param infoId
 	 * @param cid
 	 * @param code
 	 * @param firstName
@@ -255,19 +262,19 @@ public class UserServiceImpl implements UserService {
 	 * @param adminUser
 	 * @return
 	 */
-	public List<Tuser> loadAllUserByInfo(String clientNumber,String cid,String code,String firstName,String lastName,String otherName,String birth,String email,String mobile,TadminUser adminUser) {
-		List<Tuser> userList=loadUserByInfo(clientNumber, cid, code, firstName, lastName, otherName, birth, email, mobile,adminUser);
-		List<TadminUser> cidList=new ArrayList<TadminUser>();
-		for (Tuser tuser : userList) {
-			TadminUser clientId=tuser.getAdminUser();
-			if(clientId!=null){
-				cidList.add(clientId);
-			}
-		}
-		if(cidList!=null&&cidList.size()>0){
-			return loadUserListByCids(cidList);			
-		}
-		return null;
+	public List<Tuser> loadAllUserByInfo(String infoId,String cid,String code,String firstName,String lastName,String otherName,String birth,String email,String mobile,TadminUser adminUser) {
+		List<Tuser> userList=loadUserByInfo(infoId, cid, code, firstName, lastName, otherName, birth, email, mobile,adminUser);
+//		List<TadminUser> cidList=new ArrayList<TadminUser>();
+//		for (Tuser tuser : userList) {
+//			TadminUser userAccount=adminUserService.getAdminUserById(tuser.getCid());			
+//			if(userAccount!=null){
+//				cidList.add(userAccount);
+//			}
+//		}
+//		if(cidList!=null&&cidList.size()>0){
+//			return loadUserListByCids(cidList);			
+//		}
+		return userList;
 	}
 			
 }

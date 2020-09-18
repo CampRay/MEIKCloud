@@ -23,10 +23,14 @@
         <property name="otherName" type="string">
             <column name="other_name" length="100" />
         </property>
-        <!-- <property name="cid" type="string">
-            <column name="cid" length="100" />
-        </property> -->
-        <many-to-one name="adminUser" column="cid" class="com.nuvomed.dto.TadminUser"  unique="false" not-null="false"/>
+        <property name="idNumber" type="java.lang.String">
+			<column name="id_number" length="20" not-null="false">				
+			</column>
+		</property>
+        <property name="cid" type="string">
+            <column name="cid" length="100"  not-null="false"/>
+        </property>
+        <!-- <many-to-one name="adminUser" column="cid" class="com.nuvomed.dto.TadminUser"  unique="false" not-null="false"/> -->
         <property name="gender" type="java.lang.Boolean">
             <column name="gender" />
         </property>

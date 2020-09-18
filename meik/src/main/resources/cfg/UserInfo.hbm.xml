@@ -8,7 +8,10 @@
 			<column name="info_id" length="11" />
 			<generator class="native"></generator>
 		</id>
-		<many-to-one name="adminUser" column="cid" class="com.nuvomed.dto.TadminUser"  unique="false" not-null="false"/>
+		<property name="cid" type="string">
+            <column name="cid" length="100"  not-null="false"/>
+        </property>
+		<!-- <many-to-one name="adminUser" column="cid" class="com.nuvomed.dto.TadminUser"  unique="false" not-null="false"/> -->
 		
 		<property name="createdTime" type="java.lang.Long">
             <column name="created_time" length="20" not-null="true"/>              
@@ -21,29 +24,33 @@
 			<column name="language" length="20" not-null="false">				
 			</column>
 		</property>
+		<property name="idNumber" type="java.lang.String">
+			<column name="id_number" length="20" not-null="false">				
+			</column>
+		</property>
 		<!-- <property name="userId" type="java.lang.Integer">
 			<column name="user_id" length="11" not-null="false"/>							
 		</property> -->
 		<many-to-one name="user" column="user_id" class="com.nuvomed.dto.Tuser" not-null="false"/>
 		
 		<property name="firstName" type="java.lang.String">
-			<column name="first_name" length="100" not-null="true">
+			<column name="first_name" length="50" not-null="true">
 			</column>
 		</property>
 		<property name="lastName" type="java.lang.String">
-			<column name="last_name" length="100" not-null="false">
+			<column name="last_name" length="50" not-null="false">
 			</column>
 		</property>
 		<property name="otherName" type="java.lang.String">
-			<column name="other_name" length="100" not-null="false">
+			<column name="other_name" length="50" not-null="false">
 			</column>
 		</property>	
 		<property name="birthday" type="java.lang.String">
-			<column name="birthday" length="100" not-null="true">
+			<column name="birthday" length="50" not-null="true">
 			</column>
 		</property>
 		<property name="mobile" type="java.lang.String">
-			<column name="mobile" length="100" not-null="true">
+			<column name="mobile" length="50" not-null="true">
 			</column>
 		</property>
 		<property name="email" type="java.lang.String">
@@ -51,11 +58,11 @@
 			</column>
 		</property>
 		<property name="height" type="java.lang.String">
-			<column name="height" length="100" not-null="false">
+			<column name="height" length="50" not-null="false">
 			</column>
 		</property>
 		<property name="weight" type="java.lang.String">
-			<column name="weight" length="100" not-null="false">
+			<column name="weight" length="50" not-null="false">
 			</column>
 		</property>
 		<property name="address" type="java.lang.String">
@@ -75,11 +82,27 @@
 			</column>
 		</property>
 		<property name="zipcode" type="java.lang.String">
-			<column name="zipcode" length="100" not-null="false">
+			<column name="zipcode" length="20" not-null="false">
 			</column>
 		</property>
 		<property name="country" type="java.lang.String">
-			<column name="country" length="100" not-null="false">
+			<column name="country" length="50" not-null="false">
+			</column>
+		</property>
+		<property name="outPatientNumber" type="java.lang.String">
+			<column name="out_patient_number" length="50" not-null="false">
+			</column>
+		</property>
+		<property name="department" type="java.lang.String">
+			<column name="department" length="50" not-null="false">
+			</column>
+		</property>
+		<property name="hospitalNumber" type="java.lang.String">
+			<column name="hospital_number" length="50" not-null="false">
+			</column>
+		</property>
+		<property name="hospitalBedNumber" type="java.lang.String">
+			<column name="hospital_bed_number" length="50" not-null="false">
 			</column>
 		</property>
 		
