@@ -454,11 +454,11 @@ public class ClientAPI {
 			
 			adminJobService.createScreenData(userInfo, userData,admin.getAdminId());
 			respJson.put("status", 1);
-			//如果自动分析结果有值并且为-1，则表示以前没有自动分析过
-			if(userInfo.getResult()!=null&&userInfo.getResult()==-1){
-				Tuser user=userService.getUserById(userInfo.getUserId());
-				taskExecutor.execute(new MultiThreadHandler(user));
-			}
+//			//如果自动分析结果有值并且为-1，则表示以前没有自动分析过
+//			if(userInfo.getResult()!=null&&userInfo.getResult()==-1){
+//				Tuser user=userService.getUserById(userInfo.getUserId());
+//				taskExecutor.execute(new MultiThreadHandler(user));
+//			}
 																					
 		}catch (Exception e) {		
 			respJson.put("status", 0);	

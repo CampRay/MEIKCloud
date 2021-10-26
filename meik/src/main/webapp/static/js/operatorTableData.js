@@ -64,33 +64,33 @@ var OperatorTable = function () {
         				return str;
         			}
 			   },
-	           {'render':function(data,status,row){
-				   		var str = '';	                    
-	                    if(row.screenResult!=null){
-	                    	var url = rootURI+"jobs/downloadScreenPdf/"+row.jobId;
-	                    	var csvUrl = rootURI+"jobs/downloadScreenCsv/"+row.jobId;
-	                    	var result="";
-	                    	if(row.screenResult==0){
-	                    		result=loadProperties("job.screen.result.normal",local,rootURI);	                    		
-	                    	}
-	                    	if(row.screenResult==1){
-	                    		result=loadProperties("job.screen.result.benign",local,rootURI);	                    		
-	                    	}
-	                    	else if(row.screenResult==2){
-	                    		result=loadProperties("job.screen.result.suspicious",local,rootURI);	                    		
-	                    	}
-	                    	if(result!=""){
-	                    		if(row.missingData){	                    			
-	                    			str = '<div class="actions" style="font-style:italic;">'+result+": "+'<a class="btn btn-sm dark"  href="'+url+'" style="text-decoration: underline;">PDF</a><a class="btn btn-sm dark"  href="'+csvUrl+'" style="text-decoration: underline">CSV</a></div>'
-	                    		}
-	                    		else{
-	                    			str = '<div class="actions">'+result+": "+'<a class="btn btn-sm dark"  href="'+url+'" style="text-decoration: underline;">PDF</a><a class="btn btn-sm dark"  href="'+csvUrl+'" style="text-decoration: underline">CSV</a></div>'
-	                    		}
-	                    	}
-	                    }	
-		   				return str;
-   					}
-			  },
+//	           {'render':function(data,status,row){
+//				   		var str = '';	                    
+//	                    if(row.screenResult!=null){
+//	                    	var url = rootURI+"jobs/downloadScreenPdf/"+row.jobId;
+//	                    	var csvUrl = rootURI+"jobs/downloadScreenCsv/"+row.jobId;
+//	                    	var result="";
+//	                    	if(row.screenResult==0){
+//	                    		result=loadProperties("job.screen.result.normal",local,rootURI);	                    		
+//	                    	}
+//	                    	if(row.screenResult==1){
+//	                    		result=loadProperties("job.screen.result.benign",local,rootURI);	                    		
+//	                    	}
+//	                    	else if(row.screenResult==2){
+//	                    		result=loadProperties("job.screen.result.suspicious",local,rootURI);	                    		
+//	                    	}
+//	                    	if(result!=""){
+//	                    		if(row.missingData){	                    			
+//	                    			str = '<div class="actions" style="font-style:italic;">'+result+": "+'<a class="btn btn-sm dark"  href="'+url+'" style="text-decoration: underline;">PDF</a><a class="btn btn-sm dark"  href="'+csvUrl+'" style="text-decoration: underline">CSV</a></div>'
+//	                    		}
+//	                    		else{
+//	                    			str = '<div class="actions">'+result+": "+'<a class="btn btn-sm dark"  href="'+url+'" style="text-decoration: underline;">PDF</a><a class="btn btn-sm dark"  href="'+csvUrl+'" style="text-decoration: underline">CSV</a></div>'
+//	                    		}
+//	                    	}
+//	                    }	
+//		   				return str;
+//   					}
+//			  },
 			  {'render':function(data,status,row){
                   var tem = row.type;
 	   				var str = '';
